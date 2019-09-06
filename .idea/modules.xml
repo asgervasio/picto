@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Picto.iml" filepath="$PROJECT_DIR$/Picto.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/local.iml" filepath="$PROJECT_DIR$/local.iml" />
     </modules>
   </component>
 </project>
