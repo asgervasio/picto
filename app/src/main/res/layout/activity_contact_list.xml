@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/Contact List"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="403dp"
+        android:layout_height="118dp"
+        android:layout_marginStart="271dp"
+        android:layout_marginTop="117dp"
+        android:layout_marginEnd="270dp"
+        android:layout_marginBottom="99dp"
+        android:text="@string/contact_list"
+        android:textAlignment="textStart"
+        app:layout_constraintBottom_toTopOf="@+id/button2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/add"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="30dp"
-        android:layout_height="38dp"
-        android:layout_weight="1"
-        android:text="@string/Add" />
+        android:id="@+id/button"
+        android:layout_width="303dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="51dp"
+        android:layout_marginTop="109dp"
+        android:layout_marginEnd="164dp"
+        android:layout_marginBottom="1455dp"
+        android:text="@string/add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
-        android:id="@+id/delete"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/Delete" />
-</LinearLayout>
+        android:id="@+id/button2"
+        android:layout_width="369dp"
+        android:layout_height="121dp"
+        android:layout_marginStart="164dp"
+        android:layout_marginTop="99dp"
+        android:layout_marginEnd="57dp"
+        android:layout_marginBottom="1444dp"
+        android:text="@string/delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/button"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+</android.support.constraint.ConstraintLayout>
