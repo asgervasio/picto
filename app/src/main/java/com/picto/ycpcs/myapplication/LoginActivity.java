@@ -1,6 +1,7 @@
 package com.picto.ycpcs.myapplication;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 
 //import com.google.android.gms.auth.api.signin.GoogleSignIn;
 //import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -15,11 +16,6 @@ public class LoginActivity { // Configure sign-in to request the user's ID, emai
             //.build();
     // Build a GoogleSignInClient with the options specified by gso.
     //mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-    private void signIn() {
-        //Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        //startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
 
     /*
     @Override
