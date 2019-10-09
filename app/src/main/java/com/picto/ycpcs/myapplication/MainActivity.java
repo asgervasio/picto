@@ -47,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
+    //TODO: change placeholder to camera activity, also incorporate login controls
     public void gotoLogin(View view) {
         Toast toast = Toast.makeText(MainActivity.this, "Login Successfully hacked", Toast.LENGTH_LONG);
         toast.show();
