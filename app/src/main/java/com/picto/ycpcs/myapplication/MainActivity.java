@@ -1,20 +1,14 @@
 package com.picto.ycpcs.myapplication;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
 
-import com.picto.ycpcs.myapplication.ui.login.LoginActivity;
+import com.google.android.gms.location.places.Place;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /*
     public void displayToastMsg(View v){
         toastMsg("Verify Credentials, then go to camera activity");
     }
@@ -39,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         Context context = MainActivity.this;
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
     }
+     */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -56,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void gotoLogin(View view) {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Toast toast = Toast.makeText(MainActivity.this, "Login Successfully hacked", Toast.LENGTH_LONG);
+        toast.show();
+        Intent intent = new Intent(this, PlaceholderActivity.class);
         startActivity(intent);
     }
 
