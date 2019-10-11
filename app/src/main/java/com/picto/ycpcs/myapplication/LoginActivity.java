@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
@@ -49,11 +50,22 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     //TODO: change placeholder to camera activity, also incorporate login controls
-    public void gotoLogin(View view) {
-        Toast toast = Toast.makeText(LoginActivity.this, "Login Successfully hacked", Toast.LENGTH_LONG);
-        toast.show();
-        Intent intent = new Intent(this, CameraActivity.class);
-        startActivity(intent);
+
+    EditText username = findViewById(R.id.username);
+    EditText password = findViewById(R.id.password);
+    public void login(View view) {
+        if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin")){
+            //correct password
+            Toast toast = Toast.makeText(LoginActivity.this, "Login Successfully hacked", Toast.LENGTH_LONG);
+            toast.show();
+            Intent intent = new Intent(this, CameraActivity.class);
+            startActivity(intent);
+        }
+        else{
+            //wrong password
+            Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 
     /*
