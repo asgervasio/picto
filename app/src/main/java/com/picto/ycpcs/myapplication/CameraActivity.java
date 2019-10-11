@@ -51,7 +51,7 @@ public class CameraActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_camera) {
-            //Toast.makeText(MainActivity.this, "Search clicked", Toast.LENGTH_LONG).show();
+            //Toast.makeText(LoginActivity.this, "Search clicked", Toast.LENGTH_LONG).show();
             takePicture();
             return true;
         }
@@ -82,7 +82,7 @@ public class CameraActivity extends AppCompatActivity {
             switch (requestCode) {
                 case TAKE_PHOTO_CODE:
                     //ImageView cameraImage = (ImageView) findViewById(R.id.action_camera);
-                    //Toast.makeText(MainActivity.this, "picture taken", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(LoginActivity.this, "picture taken", Toast.LENGTH_LONG).show();
 
                     //File imgFile= new File(pictureImagePath);
                     //if(imgFile.exists()){
