@@ -49,18 +49,17 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    //TODO: change placeholder to camera activity, also incorporate login controls
-
-    EditText username = findViewById(R.id.username);
-    EditText password = findViewById(R.id.password);
     public void login(View view) {
+        EditText username = (EditText) findViewById(R.id.username);
+        EditText password = (EditText) findViewById(R.id.password);
+
         if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin")){
-            //correct password
-            Toast toast = Toast.makeText(LoginActivity.this, "Login Successfully hacked", Toast.LENGTH_LONG);
-            toast.show();
-            Intent intent = new Intent(this, CameraActivity.class);
-            startActivity(intent);
-        }
+        //correct password
+        Toast toast = Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_LONG);
+        toast.show();
+        Intent intent = new Intent(this, CameraActivity.class);
+        startActivity(intent);
+    }
         else{
             //wrong password
             Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_LONG);
