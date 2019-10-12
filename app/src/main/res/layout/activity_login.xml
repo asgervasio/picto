@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.picto.ycpcs.myapplication.MainActivity">
+    tools:context="com.picto.ycpcs.myapplication.LoginActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,10 +21,10 @@
         app:layout_anchorGravity="center">
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/login"
             android:layout_width="142dp"
             android:layout_height="60dp"
-            android:onClick="gotoLogin"
+            android:onClick="login"
             android:text="LOG IN"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +34,7 @@
             app:layout_constraintVertical_bias="0.549" />
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -47,7 +47,7 @@
             app:layout_constraintVertical_bias="0.252" />
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -55,7 +55,7 @@
             app:layout_constraintBottom_toTopOf="@+id/button2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editText"
+            app:layout_constraintTop_toBottomOf="@+id/username"
             app:layout_constraintVertical_bias="0.163" />
 
         <TextView
