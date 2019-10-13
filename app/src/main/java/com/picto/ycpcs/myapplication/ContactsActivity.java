@@ -8,10 +8,13 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.List;
 public class ContactsActivity extends AppCompatActivity {
     EditText nameText, emailText;
     List<Contact> contacts = new ArrayList<Contact>();
+    ListView contactListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +31,7 @@ public class ContactsActivity extends AppCompatActivity {
 
         nameText = (EditText) findViewById(R.id.ContactName);
         emailText = (EditText) findViewById(R.id.Email);
+        contactListView = (ListView)  findViewById(R.id.listView); //editListView in layout xml
         final Button addBtn = (Button)  findViewById(R.id.button);
         TabHost tabHost = (TabHost) findViewById(R.id.TabHost);
 
@@ -49,7 +54,9 @@ public class ContactsActivity extends AppCompatActivity {
         addBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Your contact has been created.", Toast.LENGTH_SHORT).show();
+                addContact(nameText.getText().toString(), emailText.getText().toString());
+                populateList();
+                Toast.makeText(getApplicationContext(), nameText.getText().toString() + "has been added to your contacts!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -72,10 +79,33 @@ public class ContactsActivity extends AppCompatActivity {
         });
     }
 
+    private void populateList() {
+        ArrayAdapter<Contact> adapter = new ContactListAdaptor();
+        contactListView.setAdapter(adapter);
+    }
     private class ContactListAdaptor extends ArrayAdapter<Contact> {
         public ContactListAdaptor() {
             super (ContactsActivity.this, R.layout.listview_item, contacts);
         }
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            if (view == null) {
+                view = getLayoutInflater().inflate(R.layout.listview_item, parent, false);
+            }
+
+            Contact currentContact = contacts.get(position);
+
+            TextView name = (TextView) view.findViewById(R.id.ContactName);
+            name.setText(currentContact.getName());
+            TextView email = (TextView) view.findViewById(R.id.Email);
+            email.setText(currentContact.getEmail());
+
+            return view;
+        }
+    }
+
+    private void addContact(String name, String email) {
+        contacts.add(new Contact(name, email));
     }
 
     @Override
@@ -101,9 +131,7 @@ public class ContactsActivity extends AppCompatActivity {
 
     }
 
-    public void addContact() {
 
-    }
 
     public void deleteContact() {
 
