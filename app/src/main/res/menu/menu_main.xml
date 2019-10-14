@@ -8,8 +8,18 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_camera"
-        android:orderInCategory="100"
-        android:title="@string/action_camera"
+        android:id="@+id/action_take_picture"
+        android:orderInCategory="101"
+        android:title="@string/action_take_picture"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_messages"
+        android:orderInCategory="104"
+        android:title="@string/action_messages"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_connect"
+        android:orderInCategory="102"
+        android:title="@string/action_connect"
         app:showAsAction="never" />
 </menu>
