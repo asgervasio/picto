@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
+        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
     }
 
     @Override
