@@ -49,21 +49,37 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    //TODO: change placeholder to camera activity, also incorporate login controls
-
     EditText username = findViewById(R.id.username);
     EditText password = findViewById(R.id.password);
+
+    public boolean isValidInput(String user, String pword){
+
+        if(user.isEmpty() || pword.isEmpty()){
+            return false;
+        }
+
+        return true;
+    }
+
+
     public void login(View view) {
-        if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin")){
-            //correct password
-            Toast toast = Toast.makeText(LoginActivity.this, "Login Successfully hacked", Toast.LENGTH_LONG);
-            toast.show();
-            Intent intent = new Intent(this, CameraActivity.class);
-            startActivity(intent);
+        if(isValidInput(username.getText().toString(), password.getText().toString())){
+            if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin")){
+                //correct password
+                Toast toast = Toast.makeText(LoginActivity.this, "Login Successfully hacked", Toast.LENGTH_LONG);
+                toast.show();
+                Intent intent = new Intent(this, CameraActivity.class);
+                startActivity(intent);
+            }
+            else{
+                //wrong password
+                Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_LONG);
+                toast.show();
+            }
         }
         else{
-            //wrong password
-            Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_LONG);
+            //not valid input
+            Toast toast = Toast.makeText(LoginActivity.this, "Invalid input", Toast.LENGTH_LONG);
             toast.show();
         }
     }
