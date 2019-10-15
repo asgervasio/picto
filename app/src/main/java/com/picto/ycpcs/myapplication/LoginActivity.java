@@ -11,10 +11,14 @@ import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
 
+    EditText username, password;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        username = (EditText)findViewById(R.id.username);
+        password = (EditText)findViewById(R.id.password);
     }
 
     @Override
@@ -47,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     public static boolean isAdminLogin(String user, String pword){
-        if(user.toString() == "admin" && pword.toString() == "admin"){
+        if(user == "admin" && pword == "admin"){
             return true;
         }
         else{
@@ -55,28 +59,24 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
-    EditText username = findViewById(R.id.username);
-    EditText password = findViewById(R.id.password);
-
     public void login(View view) {
         if(isValidInput(username.getText().toString(), password.getText().toString())){
             if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin")){
                 //correct password
-                Toast toast = Toast.makeText(LoginActivity.this, "Login Successfully hacked", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_LONG);
                 toast.show();
                 Intent intent = new Intent(this, CameraActivity.class);
                 startActivity(intent);
             }
             else{
                 //wrong password
-                Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
         else{
             //not valid input
-            Toast toast = Toast.makeText(LoginActivity.this, "Invalid input", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(LoginActivity.this, "Invalid input", Toast.LENGTH_SHORT);
             toast.show();
         }
     }
