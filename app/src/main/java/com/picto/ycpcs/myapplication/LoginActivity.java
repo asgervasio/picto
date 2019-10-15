@@ -24,17 +24,6 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    /*
-    public void displayToastMsg(View v){
-        toastMsg("Verify Credentials, then go to camera activity");
-    }
-
-    public void toastMsg(String msg){
-        Context context = LoginActivity.this;
-        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-    }
-     */
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -48,19 +37,27 @@ public class LoginActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    EditText username = findViewById(R.id.username);
-    EditText password = findViewById(R.id.password);
-
-    public boolean isValidInput(String user, String pword){
+    public static boolean isValidInput(String user, String pword){
 
         if(user.isEmpty() || pword.isEmpty()){
             return false;
         }
-
         return true;
     }
 
+
+    public static boolean isAdminLogin(String user, String pword){
+        if(user.toString() == "admin" && pword.toString() == "admin"){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
+    EditText username = findViewById(R.id.username);
+    EditText password = findViewById(R.id.password);
 
     public void login(View view) {
         if(isValidInput(username.getText().toString(), password.getText().toString())){
@@ -83,21 +80,5 @@ public class LoginActivity extends AppCompatActivity {
             toast.show();
         }
     }
-
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                String result=data.getStringExtra("result");
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                Toast toast = new Toast(getApplicationContext());
-                toast.makeText(this, "Login Failed", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-    */
 
 }
