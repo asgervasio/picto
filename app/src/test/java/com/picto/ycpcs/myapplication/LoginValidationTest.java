@@ -22,4 +22,8 @@ public class LoginValidationTest {
     public void assertIsUserLogin(){
         assertEquals(false, LoginActivity.isAdminLogin("a", "b"));
     }
+    @Test
+    public void assertCreateAccountValid(){
+        assertEquals(false, LoginActivity.validAccountCredentials("a","b"));
+    }
 }

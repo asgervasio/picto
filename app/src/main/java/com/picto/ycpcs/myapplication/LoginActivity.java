@@ -17,9 +17,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        username = (EditText) findViewById(R.id.username);
-        password = (EditText) findViewById(R.id.password);
+        username = (EditText)findViewById(R.id.username);
+        password = (EditText)findViewById(R.id.password);
     }
 
     @Override
@@ -42,24 +41,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    public static boolean isValidInput(String user, String pword){
-
-        if(user.isEmpty() || pword.isEmpty()){
-            return false;
-        }
-        return true;
-    }
-
-
-    public static boolean isAdminLogin(String user, String pword){
-        if(user.toString() == "admin" && pword.toString() == "admin"){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
 
     public void login(View view) {
         if(isValidInput(username.getText().toString(), password.getText().toString())){
@@ -72,14 +53,45 @@ public class LoginActivity extends AppCompatActivity {
             }
             else{
                 //wrong password
-                Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
         else{
             //not valid input
-            Toast toast = Toast.makeText(LoginActivity.this, "Invalid input", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(LoginActivity.this, "Invalid input", Toast.LENGTH_SHORT);
             toast.show();
+        }
+    }
+
+    public static boolean isValidInput(String user, String pword){
+
+        if(user.isEmpty() || pword.isEmpty()){
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean validAccountCredentials(String username, String email){
+        if(accountExists(username, email)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public static boolean accountExists(String username, String email){
+        //TODO update when user account objects are checkable
+        return false;
+    }
+
+    public static boolean isAdminLogin(String user, String pword){
+        if(user == "admin" && pword == "admin"){
+            return true;
+        }
+        else{
+            return false;
         }
     }
 
