@@ -108,7 +108,7 @@ public class SettingsActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication\n", "com.picto.ycpcs.myapplication.CameraActivity\n"));
+        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
     }
 
     public void showSettingsSavedDialogButtonClicked(View view) {
