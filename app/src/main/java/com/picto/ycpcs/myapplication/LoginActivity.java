@@ -2,23 +2,95 @@ package com.picto.ycpcs.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class LoginActivity extends AppCompatActivity {
 
-    EditText username, password;
+    EditText emailText, passwordText;
+    String email, password;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        username = (EditText)findViewById(R.id.username);
-        password = (EditText)findViewById(R.id.password);
+        emailText = (EditText)findViewById(R.id.email);
+        passwordText = (EditText)findViewById(R.id.password);
+        email = emailText.toString();
+        password = passwordText.toString();
+        mAuth = FirebaseAuth.getInstance();
+    }
+
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+    }
+
+    public void createAccount(String email, String password){
+        //TODO Validate credentials are correct
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "User Authenticated",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        // ...
+                    }
+                });
+    }
+
+    public void signIn(String email, String password){
+        //TODO Validate credentials are correct
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "User Authenticated",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        // ...
+                    }
+                });
+    }
+
+    public void logIn(View v){
+        signIn(email, password);
+    }
+
+    public void createAcct(View v){
+        createAccount(email, password);
     }
 
     @Override
@@ -42,9 +114,10 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void login(View view) {
-        if(isValidInput(username.getText().toString(), password.getText().toString())){
-            if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin")){
+/*
+    public void logInOld(View view) {
+        if(isValidInput(emailText.getText().toString(), passwordText.getText().toString())){
+            if(emailText.getText().toString().equals("admin") && passwordText.getText().toString().equals("admin")){
                 //correct password
                 Toast toast = Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_LONG);
                 toast.show();
@@ -63,6 +136,7 @@ public class LoginActivity extends AppCompatActivity {
             toast.show();
         }
     }
+*/
 
     public static boolean isValidInput(String user, String pword){
 
