@@ -1,15 +1,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.picto.ycpcs.myapplication.MainActivity">
+    tools:context="com.picto.ycpcs.myapplication.CameraActivity">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_contacts"
-        android:orderInCategory="100"
-        android:title="@string/action_contacts"
+        android:id="@+id/action_take_picture"
+        android:orderInCategory="101"
+        android:title="@string/action_take_picture"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_messages"
+        android:orderInCategory="104"
+        android:title="@string/action_messages"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_connect"
+        android:orderInCategory="102"
+        android:title="@string/action_connect"
         app:showAsAction="never" />
 </menu>

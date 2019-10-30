@@ -23,9 +23,9 @@ import java.util.Date;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class MainActivity extends AppCompatActivity {
+public class CameraActivity extends AppCompatActivity {
 
-    //public static int count = 0;
+    public static int count = 0;
     final int TAKE_PHOTO_CODE = 5;
     ImageView imageView ;
     ApplicationState applicationState = null;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         imageView = (ImageView)findViewById(R.id.imageView);
-        //Toast.makeText(MainActivity.this, "Picto app started", Toast.LENGTH_LONG).show();
+        Toast.makeText(CameraActivity.this, "Picto app started", Toast.LENGTH_LONG).show();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -49,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // get global data reference
+        applicationState = ((ApplicationState)getApplicationContext());
+        applicationState.setParentActivity(this);
+
+        loadSettings(); // load user settings
     }
 
     @Override
@@ -75,13 +80,13 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            //Toast.makeText(MainActivity.this, "settings clicked", Toast.LENGTH_LONG).show();
+            Toast.makeText(CameraActivity.this, "settings clicked", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
         else if (id == R.id.action_messages)
         {
-            //Toast.makeText(MainActivity.this, "messages clicked", Toast.LENGTH_LONG).show();
+            Toast.makeText(CameraActivity.this, "messages clicked", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, MessagesListActivity.class));
             return true;
         }
@@ -90,26 +95,37 @@ public class MainActivity extends AppCompatActivity {
             takePicture();
             return true;
         }
-        /*
         else if (id == R.id.action_connect) {
-            Toast.makeText(MainActivity.this, "Connect not supported", Toast.LENGTH_LONG).show();
-
-            //ConnectOperation asyncTask=new ConnectOperation();
-            //asyncTask.execute("https://www.tutorialspoint.com/images/tp-logo-diamond.png");
+            Toast.makeText(CameraActivity.this, "New Connect clicked", Toast.LENGTH_LONG).show();
+            //connect();
+            ConnectOperation asyncTask=new ConnectOperation();
+            asyncTask.execute("");
             return true;
         }
-*/
+
         return super.onOptionsItemSelected(item);
     }
 
 
     public void takePicture()
     {
-        //Toast.makeText(MainActivity.this, "take picture clicked", Toast.LENGTH_LONG).show();
+        //testCompression();
+
+        //final String picturesPath = getApplicationContext().getFilesDir().getPath().toString() + "/snap_it_picFolder/"; // Files dir
+        Toast.makeText(CameraActivity.this, "take picture clicked", Toast.LENGTH_LONG).show();
+
+        //Toast.makeText(MainActivity.this, "folder: " + picturesPath, Toast.LENGTH_LONG).show();
+
+        // Here, we are making a folder named picFolder to store
+        // pics taken by the camera using this application.
+        //File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        //Toast.makeText(MainActivity.this, "folder: " + path.getPath(), Toast.LENGTH_LONG).show();
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
         startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+
     }
 
     @Override
@@ -118,12 +134,14 @@ public class MainActivity extends AppCompatActivity {
             switch (requestCode) {
 
                 case TAKE_PHOTO_CODE:
+                    //Toast.makeText(MainActivity.this, "picture taken", Toast.LENGTH_LONG).show();
                     Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                     applicationState.setLastPicture(bitmap);
                     int size = bitmap.getByteCount();
-                    //Toast.makeText(MainActivity.this, "picture taken, size is: " + size + " bytes", Toast.LENGTH_LONG).show();
+                    Toast.makeText(CameraActivity.this, "picture taken, size is: " + size + " bytes", Toast.LENGTH_LONG).show();
                     imageView.setImageBitmap(bitmap);
 
+                    //saveBitmapToFile(bitmap);
 
                     startActivity(new Intent(this, MessageSendSaveActivity.class));
                     break;
@@ -136,36 +154,36 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        //Toast.makeText(MainActivity.this, "result hit resultCode " + resultCode + "  REQUEST code " + requestCode, Toast.LENGTH_LONG).show();
+        Toast.makeText(CameraActivity.this, "result hit resultCode " + resultCode + "  REQUEST code " + requestCode, Toast.LENGTH_LONG).show();
 
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-/*
+
     public void saveBitmapToFile(final Bitmap bmp)
     {
         // this needs to be run in its own thread because the compression can take some time and
         // we don't want to stall the GUI thread.
         runOnUiThread(new Runnable() {
             public void run() {
-
+                //Toast.makeText(MainActivity.this, "jpeg compressed message", Toast.LENGTH_SHORT).show();
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
-                Toast.makeText(MainActivity.this, "PNG COMPRESSED Size " + byteArray.length, Toast.LENGTH_LONG).show();
+                Toast.makeText(CameraActivity.this, "PNG COMPRESSED Size " + byteArray.length, Toast.LENGTH_LONG).show();
 
                 addMessage(byteArray);
 
                 //DECODE
                 Bitmap compressed_bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.length);
-
+                //Bitmap bitmap = BitmapFactory.decodeFile("/path/images/image.jpg");
                 ByteArrayOutputStream blob = new ByteArrayOutputStream();
-                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 , blob);
+                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 /* Ignored for PNGs */, blob);
                 byte[] bitmapdata = blob.toByteArray();
 
                 Bitmap newbitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
                 int size = newbitmap.getByteCount();
-                Toast.makeText(MainActivity.this, "recovered picture size is: " + size + " bytes", Toast.LENGTH_LONG).show();
+                Toast.makeText(CameraActivity.this, "recovered picture size is: " + size + " bytes", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -184,8 +202,12 @@ public class MainActivity extends AppCompatActivity {
 
         byte[] resultBytes = applicationState.historyItemToBytes(newItem);
 
+        //byte[] resultBytes = historyItemToBytes(newItem); // serialise
+        //HistoryItem resultItem = bytesToHistoryItem(resultBytes);  //deserilize
+
         applicationState.addHistoryItem(newItem); // add this new scan to the history list
         applicationState.createHistoryFile(filename,resultBytes);
+        //applicationState.createHistoryFile(newItem.filename(), newItem.name()); // save this history information file
 
 
     }
@@ -220,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
             // handle
         }
     }
-*/
+
     void loadSettings()
     {
         try {
@@ -242,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-/*
+
     private class ConnectOperation extends AsyncTask<String, Void, String> {
 
         @Override
@@ -280,16 +302,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Void... values) {}
     }
-
-
-        public void toastOnGUI(final String message) {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    // use data here
-                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-
-        */
+    public void toastOnGUI(final String message) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                // use data here
+                Toast.makeText(CameraActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }
