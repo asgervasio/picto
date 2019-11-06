@@ -41,6 +41,7 @@ public class CameraActivity extends AppCompatActivity {
         Toast.makeText(CameraActivity.this, "Picto app started", Toast.LENGTH_LONG).show();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,10 +49,11 @@ public class CameraActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        */
 
         // get global data reference
-        applicationState = ((ApplicationState)getApplicationContext());
-        applicationState.setParentActivity(this);
+        //applicationState = ((ApplicationState)getApplicationContext());
+        //applicationState.setParentActivity(this);
 
         loadSettings(); // load user settings
     }
