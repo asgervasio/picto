@@ -17,7 +17,6 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
-import com.picto.ycpcs.myapplication.R.id.imageView;
 
 public class MessageSendSaveActivity extends AppCompatActivity {
 

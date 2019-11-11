@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
-import static com.cs381.picto.R.id.imageView;
 
 public class PictureSaveActivity extends AppCompatActivity {
 
