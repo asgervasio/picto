@@ -54,7 +54,7 @@ public class PictoDB {
 	}
 	
 	// open Mysql DB and test the connection
-	private void openDB()
+	private synchronized void openDB()
 	{
 		closeDB(); // close the DB in case it is already opened
 		
@@ -122,7 +122,7 @@ public class PictoDB {
 	
 	
 	// close mysql DB
-	private void closeDB()
+	private synchronized void closeDB()
 	{
 		try
 		{
@@ -135,7 +135,7 @@ public class PictoDB {
 	    }//end finally try
 	}
 	
-	public boolean isValidUserAccount(String user)
+	public synchronized boolean isValidUserAccount(String user)
 	{				
 		String userFolder = serverDBFolder + user.toLowerCase()  + "/";
 		File folder = new File(userFolder);
@@ -143,7 +143,7 @@ public class PictoDB {
 		return(folder.exists());		
 	}
 	
-	public boolean createUserAccount(String user)
+	public synchronized boolean createUserAccount(String user)
 	{
 		boolean rv = false;
 					
@@ -168,7 +168,7 @@ public class PictoDB {
 	// after message is copied from user inbox it is removed from the server
 	// the server doesn't keep copies of user messages
 	
-	public List<PictoMessage> getUserMessages(String user)
+	public synchronized List<PictoMessage> getUserMessages(String user)
 	{
 		List<PictoMessage> listOfMessages = new ArrayList<PictoMessage>();
 		PictoMessage msg;
@@ -218,7 +218,7 @@ public class PictoDB {
 		return listOfMessages;
 	}
 	
-	public void storeUserMessage(PictoMessage msg)
+	public synchronized void storeUserMessage(PictoMessage msg) throws Exception
 	{		
 		String userFolder = serverDBFolder + msg.toAddress().toLowerCase() +  "/";
 		
@@ -233,17 +233,18 @@ public class PictoDB {
 		
 		String full_path = userFolder + uuid;
 		
-		byte[] msg_bytes = PictoMessage.pictoMessageToBytes(msg);
+		//byte[] msg_bytes = PictoMessage.pictoMessageToBytes(msg);
 		try (FileOutputStream fos = new FileOutputStream(full_path)) 
 		{
-			   fos.write(msg_bytes);
+			byte[] msg_bytes = PictoMessage.pictoMessageToBytes(msg);
+			fos.write(msg_bytes);
 			   //There is no more need to call close() since 
 			   //we created the instance of "fos" inside the try. 
 			   // And this will automatically close the OutputStream
 		}
 		catch(Exception e)
 		{
-			
+			throw e;
 		}
 		
 	}
