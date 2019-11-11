@@ -14,8 +14,12 @@ public class CommandHeader {
     public static final int SIGNATURE = 0x01491625;
     public static final int CMD_SEND_MSG = 1;
     public static final int CMD_READ_MSG = 2;
+    public static final int CMD_PING_MSG = 3;
+    public static final int CMD_LOGIN_MSG = 4;
     public static final int STATUS_SUCCESS = 0;
+    public static final int STATUS_ERROR_USER_NOT_FOUND = 1;
     public static final int STATUS_ERROR_UNAUTHORIZED = 2;
+    public static final int STATUS_ERROR_LOGIN_USERNAME_USED = 3;
 
 
     public CommandHeader(int signature,int commandType,int version,int status, int payloadSize)
@@ -29,43 +33,43 @@ public class CommandHeader {
     }
 
     // get the signature
-    public int signature()
+    public synchronized int signature()
     {
         return this.signature;
     }
 
     // set the signature
-    public void signature(int signature)
+    public synchronized void signature(int signature)
     {
         this.signature = signature;
     }
     
     // get the commandType
-    public int commandType()
+    public synchronized int commandType()
     {
         return this.commandType;
     }
 
     // set the commandType
-    public void commandType(int commandType)
+    public synchronized void commandType(int commandType)
     {
         this.commandType = commandType;
     }
   
     // get the commandStatus
-    public int commandStatus()
+    public synchronized int commandStatus()
     {
         return this.status;
     }
 
     // set the commandStatus
-    public void commandStatus(int status)
+    public synchronized void commandStatus(int status)
     {
         this.status = status;
     }
     
     // get the payloadSize
-    public int payloadSize()
+    public synchronized int payloadSize()
     {
         return this.payloadSize;
     }
@@ -77,7 +81,7 @@ public class CommandHeader {
     }
     
     // export to byte array
-    public byte[] exportHeader()
+    public synchronized byte[] exportHeader()
     {
     	byte[] export = new byte[HEADER_SIZE];
     	byte[] signature_bytes = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(this.signature).array();
@@ -94,7 +98,7 @@ public class CommandHeader {
     	
         return export;
     }
-    public void importHeader(byte[] header)
+    public synchronized void importHeader(byte[] header)
     {
     	byte[] signature_bytes = new byte[4];
     	byte[] commandType_bytes = new byte[4];

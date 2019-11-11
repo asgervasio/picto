@@ -12,13 +12,22 @@ import android.widget.Toast;
 public class LoginActivity extends AppCompatActivity {
 
     EditText username, password;
+    ApplicationState applicationState = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        applicationState = ((ApplicationState)getApplicationContext());
+
         username = (EditText)findViewById(R.id.username);
         password = (EditText)findViewById(R.id.password);
+
+        username.setText(applicationState.username());
+        password.setText(applicationState.password());
+
+
     }
 
     @Override
