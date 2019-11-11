@@ -22,4 +22,5 @@
         android:orderInCategory="102"
         android:title="@string/action_connect"
         app:showAsAction="never" />
+    <item android:title="@string/action_contacts" android:orderInCategory="105" android:id="@+id/action_contacts"/>
 </menu>

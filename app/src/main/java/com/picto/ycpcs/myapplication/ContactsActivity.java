@@ -19,7 +19,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactsActivity extends AppCompatActivity {
+public class ContactsActivity extends AppCompatActivity { // issue here some where
     EditText nameText, emailText;
     List<Contact> contacts = new ArrayList<Contact>();
     ListView contactListView;
@@ -33,7 +33,7 @@ public class ContactsActivity extends AppCompatActivity {
         emailText = (EditText) findViewById(R.id.Email);
         contactListView = (ListView)  findViewById(R.id.listView); //editListView in layout xml
         final Button addBtn = (Button)  findViewById(R.id.button);
-        TabHost tabHost = (TabHost) findViewById(R.id.TabHost);
+       /* TabHost tabHost = (TabHost) findViewById(R.id.TabHost);
 
         tabHost.setup();
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("list");
@@ -49,13 +49,13 @@ public class ContactsActivity extends AppCompatActivity {
         tabSpec = tabHost.newTabSpec("delete");
         tabSpec.setContent(R.id.DeleteTab);
         tabSpec.setIndicator("Delete");
-        tabHost.addTab(tabSpec);
+        tabHost.addTab(tabSpec);*/ // Get rid of tab stuff
 
         addBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 addContact(nameText.getText().toString(), emailText.getText().toString());
-                populateList();
+                populateList(); // issue here
                 Toast.makeText(getApplicationContext(), nameText.getText().toString() + "has been added to your contacts!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -81,7 +81,7 @@ public class ContactsActivity extends AppCompatActivity {
 
     private void populateList() {
         ArrayAdapter<Contact> adapter = new ContactListAdaptor();
-        contactListView.setAdapter(adapter);
+        contactListView.setAdapter(adapter); // issue here
     }
     private class ContactListAdaptor extends ArrayAdapter<Contact> {
         public ContactListAdaptor() {
