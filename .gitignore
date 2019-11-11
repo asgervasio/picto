@@ -11,3 +11,8 @@ local.properties
 .idea/caches/build_file_checksums.ser
 .idea/caches/gradle_models.ser
 *.properties
+*.ser
+*.ser
+*.ser
+.idea/caches/build_file_checksums.ser
+local.properties
