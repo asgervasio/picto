@@ -25,29 +25,16 @@
         android:id="@+id/editTextCaption"
         android:hint="Caption" />
 
-    <Spinner
+    <Button
+        android:text="Save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/spinnerTimeout"
-        android:elevation="1dp"
-        android:prompt="@string/timeout_prompt"
-        android:entries="@array/timeout_array"
-        android:spinnerMode="dialog" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/editText_toAddress"
-        android:hint="To:" />
+        android:id="@+id/buttonSave" />
 
     <Button
-        android:text="Send"
+        android:text="Trash"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/buttonSend" />
-
-
+        android:id="@+id/buttonTrash" />
 
 </LinearLayout>

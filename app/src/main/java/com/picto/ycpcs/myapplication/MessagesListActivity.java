@@ -22,8 +22,8 @@ public class MessagesListActivity extends AppCompatActivity {
 
     static boolean activityRunning = true;
 
-    static ListView historyListView;
-    static ArrayAdapter<MessageListItem> historyArrayAdapter;
+    static ListView messageListView;
+    static ArrayAdapter<MessageListItem> messageArrayAdapter;
     ArrayList<MessageListItem> historyCache = new ArrayList<MessageListItem>();
 
     ApplicationState applicationState = null;
@@ -35,17 +35,18 @@ public class MessagesListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_messages_list);
 
 
-        historyListView = (ListView)this.findViewById(R.id.listViewHistory);
+        messageListView = (ListView)this.findViewById(R.id.listViewHistory);
         // get global data reference
         applicationState = ((ApplicationState)getApplicationContext());
 
-        historyListView.setItemsCanFocus(false);
-        historyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE); // CHOICE_MODE_MULTIPLE
+        messageListView.setItemsCanFocus(false);
+        messageListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE); // CHOICE_MODE_MULTIPLE
 
 
-        applicationState.LoadHistoryListNew();
 
-        Vector historyList = applicationState.getHistoryList();
+        applicationState.LoadMessageList();
+
+        Vector historyList = applicationState.getMessageList();
         int sizeToRead = historyList.size();
 
         synchronized(historyList)
@@ -56,10 +57,21 @@ public class MessagesListActivity extends AppCompatActivity {
         }
 
         int layoutID = android.R.layout.simple_list_item_multiple_choice;
-        historyArrayAdapter = new ArrayAdapter<MessageListItem>(this, layoutID , historyCache);
-        historyListView.setAdapter(historyArrayAdapter);
+        messageArrayAdapter = new ArrayAdapter<MessageListItem>(this, layoutID , historyCache);
+        messageListView.setAdapter(messageArrayAdapter);
 
         activityRunning = true;
+
+        String filename = applicationState.messageToDelete();
+        if(filename.length() > 0)
+        {
+            DeleteMessageItem(filename);
+            applicationState.messageToDelete("");
+            sizeToRead = historyList.size();
+            startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+        }
+
+
 
         if(sizeToRead == 0)
         {
@@ -82,7 +94,7 @@ public class MessagesListActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication"));
     }
 
     @Override
@@ -118,9 +130,9 @@ public class MessagesListActivity extends AppCompatActivity {
                     DisplayAlertOKDialog("You have multiples message items selected. Only single message view is supported!");
                 }
                 else {
-                    SetHistoryToView();
+                    SetMessageToView();
                     intent = new Intent();
-                    intent.setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.MessageViewActivity");
+                    intent.setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication");
                     startActivity(intent);
                 }
                 return true;
@@ -166,17 +178,17 @@ public class MessagesListActivity extends AppCompatActivity {
 
         MessageListItem theItem = null;
 
-        int listCount = historyListView.getCount();
+        int listCount = messageListView.getCount();
         for(int index = listCount-1; index>=0; index--)
         {
-            if(historyListView.isItemChecked(index) == true)
+            if(messageListView.isItemChecked(index) == true)
             {
 
-                theItem = (MessageListItem)applicationState.getHistoryList().get(index);
+                theItem = (MessageListItem)applicationState.getMessageList().get(index);
                 String filename = theItem.filename();
 
                 applicationState.delete_File(filename);
-                applicationState.getHistoryList().remove(index);
+                applicationState.getMessageList().remove(index);
                 historyCache.remove(index);
 
             }
@@ -184,7 +196,33 @@ public class MessagesListActivity extends AppCompatActivity {
 
         runOnUiThread(refreshEventsView);
 
+    }
 
+    // deletes any history items that are currently checked off.
+    public void DeleteMessageItem(String filenameToDelete)
+    {
+
+        MessageListItem theItem = null;
+
+        int listCount = messageListView.getCount();
+        for(int index = listCount-1; index>=0; index--)
+        {
+            // if(messageListView.isItemChecked(index) == true)
+
+
+            theItem = (MessageListItem)applicationState.getMessageList().get(index);
+            String filename = theItem.filename();
+            if(filename.equals(filenameToDelete)  == true)
+            {
+                applicationState.delete_File(filename);
+                applicationState.getMessageList().remove(index);
+                historyCache.remove(index);
+                break;
+
+            }
+        }
+
+        runOnUiThread(refreshEventsView);
 
     }
 
@@ -194,12 +232,12 @@ public class MessagesListActivity extends AppCompatActivity {
         int selectedCount = 0;
         filesSelected = "";
 
-        int listCount = historyListView.getCount();
+        int listCount = messageListView.getCount();
         for(int index = listCount-1; index>=0; index--)
         {
-            if(historyListView.isItemChecked(index) == true)
+            if(messageListView.isItemChecked(index) == true)
             {
-                theItem = (MessageListItem)applicationState.getHistoryList().get(index);
+                theItem = (MessageListItem)applicationState.getMessageList().get(index);
                 String filename = theItem.filename();
                 filesSelected = filesSelected + "\n" + theItem.filename();
                 selectedCount++;
@@ -212,19 +250,19 @@ public class MessagesListActivity extends AppCompatActivity {
     }
 
     // this just save the current history to view to global memory
-    public void SetHistoryToView()
+    public void SetMessageToView()
     {
 
         MessageListItem theItem = null;
 
-        int listCount = historyListView.getCount();
+        int listCount = messageListView.getCount();
         for(int index = listCount-1; index>=0; index--)
         {
-            if(historyListView.isItemChecked(index) == true)
+            if(messageListView.isItemChecked(index) == true)
             {
 
-                theItem = (MessageListItem)applicationState.getHistoryList().get(index);
-                applicationState.historyToView(theItem);
+                theItem = (MessageListItem)applicationState.getMessageList().get(index);
+                applicationState.messageToView(theItem);
 
             }
         }
@@ -244,8 +282,8 @@ public class MessagesListActivity extends AppCompatActivity {
             if(activityRunning == false)
                 return;
 
-            historyListView.clearChoices();  // clear list choices
-            historyArrayAdapter.notifyDataSetChanged();
+            messageListView.clearChoices();  // clear list choices
+            messageArrayAdapter.notifyDataSetChanged();
 
         }
     };

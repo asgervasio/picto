@@ -16,6 +16,7 @@
             android:name=".LoginActivity"
             android:label="LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
+<<<<<<< HEAD
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -26,6 +27,22 @@
             android:label="CameraActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+=======
+
+        </activity>
+        <activity android:name=".MessageCreateActivity" />
+        <activity android:name=".LoginActivity" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".MessagesListActivity" />
+        <activity android:name=".MessageViewActivity" />
+        <activity android:name=".MessageSendSaveActivity"></activity>
+>>>>>>> master
     </application>
 
 </manifest>

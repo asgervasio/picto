@@ -25,29 +25,47 @@ public class PictoClient  {
 		appstate = ApplicationState.getApplicationStateInstance();
 		
 	}
-	public boolean connect(String ip_address)
+	public synchronized boolean connect(String ip_address)
 	{
 		boolean rv = true;
 		// create IO_Thread to handle sockets sends and receives
 		   ioThread = new IO_Thread();
 		// connect to the specified server ip address
 		   rv = ioThread.connect(ip_address);
-		   //System.out.println("started Client thread ");
-		// start the IO thread
-		   ioThread.start();
+		if(rv == true)
+		{
+			//System.out.println("started Client thread ");
+			// start the IO thread
+			ioThread.start();
+		}
 		   
 		   return rv;
 	}
 	
-	public boolean disconnect()
+	public synchronized boolean disconnect(boolean showLogin)
 	{
 		boolean rv = false;
 		
-		rv = ioThread.disconnect();
+		rv = ioThread.disconnect(showLogin);
 		
 		return rv;
 	}
-	
+
+	public synchronized boolean pingServer() throws Exception
+	{
+		boolean rv = false;
+
+        try {
+            rv = ioThread.PingServer();
+        }
+        catch(Exception e)
+        {
+            throw e;
+        }
+
+		return rv;
+	}
+	/*
 	public boolean login(String username, String password)
 	{
 		boolean rv = true;
@@ -58,8 +76,26 @@ public class PictoClient  {
 		// need to implement this
 		return rv;
 	}
+	*/
+	public synchronized int login(String username, String password,boolean newAccount)
+	{
+		int rv = CommandHeader.STATUS_SUCCESS;
+
+		this.username = username.toLowerCase();
+		this.password = password;
+
+        try {
+            rv = ioThread.LoginToServer(this.username, this.password, newAccount);
+        }
+        catch(Exception e)
+        {
+
+        }
+
+		return rv;
+	}
 	
-	public boolean sendMessageToServer(PictoMessage msg)
+	public synchronized boolean sendMessageToServer(PictoMessage msg)
 	{
 		boolean rv = true;
 		
@@ -69,7 +105,7 @@ public class PictoClient  {
 		return rv;
 	}
 	
-	public PictoMessage readMessageFromServer()
+	public synchronized PictoMessage readMessageFromServer()
 	{
 		PictoMessage msg = null;
 		
@@ -79,7 +115,7 @@ public class PictoClient  {
 	}
 
 
-	boolean getMessages()
+    synchronized boolean getMessages()
 	{
 		// create Request_Message 
 		// submit message to the out bound message queue

@@ -5,6 +5,7 @@
     <string name="action_connect">Connect</string>
     <string name="action_login">Login</string>
     <string name="action_messages">Messages</string>
+    <string name="action_pictures">Pictures</string>
     <string name="action_add_message">Add Message</string>
     <string name="user_id_prompt">Enter User ID</string>
     <string name="password_prompt">Enter Password</string>
@@ -12,4 +13,17 @@
     <string name="cancel_button_label">Cancel</string>
     <string name="submit_button">Submit</string>
     <string name="title_activity_message_send_save">MessageSendSaveActivity</string>
+    <string name="timeout_prompt">Choose a timeout (seconds)</string>
+    <string-array name="timeout_array">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
 </resources>

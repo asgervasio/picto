@@ -23,31 +23,31 @@ public class PictoSettings implements Serializable {
     }
 
     // get the ipAddress
-    public String ipAddress()
+    public synchronized String ipAddress()
     {
         return this.ipAddress;
     }
 
     // set the ipAddress
-    public void ipAddress(String ipAddress)
+    public synchronized void ipAddress(String ipAddress)
     {
         this.ipAddress = ipAddress;
     }
 
     // get the username
-    public String username()
+    public synchronized String username()
     {
         return this.username;
     }
 
     // set the username
-    public void username(String username)
+    public synchronized void username(String username)
     {
         this.username = username;
     }
 
     // convert the PictoSettings to a byte array
-    static byte[] pictoSettingsToBytes(PictoSettings item)
+    static synchronized byte[] pictoSettingsToBytes(PictoSettings item)
     {
         byte[] resultBytes = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -80,7 +80,7 @@ public class PictoSettings implements Serializable {
     }
 
     // convert the byte array to a PictoSettings
-    static PictoSettings bytesToPictoSettings(byte[] itemBytes)
+    static synchronized PictoSettings bytesToPictoSettings(byte[] itemBytes)
     {
         PictoSettings item = null;
         ByteArrayInputStream bis = new ByteArrayInputStream(itemBytes);

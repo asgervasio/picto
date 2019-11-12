@@ -25,9 +25,15 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 
+import java.security.SecureRandom;
 import java.util.Vector;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 
 public class ApplicationState extends Application
@@ -36,33 +42,84 @@ public class ApplicationState extends Application
 
     static boolean serviceRunning = false;
 
-    MessageListItem historyToView = null;
+    String messageFilenameToDelete = "";
+    MessageListItem messageToView = null;
+    MessageListItem pictureToView = null;
     CameraActivity parent;
 
-    static Vector historyList = new Vector();
+    static Vector messageList = new Vector();
     static Vector selectedHistorys = new Vector();
+
+    static Vector pictureList = new Vector();
+    static Vector selectedPictures = new Vector();
 
     static Vector<PictoMessage> messageListSend = new Vector<PictoMessage>();
     static Vector<PictoMessage> messageListReceive = new Vector<PictoMessage>();
 
     static Bitmap bitmap_lastPicture = null;
+    MessageListItem lastMessage = null;
 
     static PictoClient client = null;
 
-    static final String picto_msg_file_prefix = "picto_msg_";
+    static final String picto_msg_file_prefix = "picto_msg_";  // message file prefix
+    static final String picto_pic_file_prefix = "picto_pic_";  // picture file prefix
     static final String pictoSettingsFilename = "picto_settings.cfg";
 
+    static final String picto_msg_type_Received = "Received";
+    static final String picto_msg_type_Sent = "Sent";
     private String ipAddress;
-    private String username;
+    private String username = "";
+    private String password = "";
 
     private String toAddress;
     private String caption;
+    private String contentSettings;
+
     static byte[] bytes_lastPicture_compressed;
     static int new_messages_count = 0;
+    static int new_pictures_count = 0;
+    static boolean loggedIn = false;
+
+    static String lastStatusMessage = "";
+    static boolean debugEnabled = false;
+
+    public void debugEnabled(boolean debugEnabled)
+    {
+        this.debugEnabled = debugEnabled;
+    }
+
+    public boolean debugEnabled()
+    {
+        return(debugEnabled);
+    }
+
+    public void addStatusMessage(String msg)
+    {
+        if( lastStatusMessage.length() > 280)
+        {
+            lastStatusMessage = lastStatusMessage.substring(200) + " ,TRUNC ";
+        }
+        lastStatusMessage = lastStatusMessage + msg;
+    }
+
+    public synchronized boolean  loggedIn()
+    {
+        return (this.loggedIn);
+    }
+
+    public synchronized void loggedIn(boolean loggedIn)
+    {
+        this.loggedIn = loggedIn;
+    }
 
     public synchronized int  getNewMessagesCount()
     {
         return (this.new_messages_count);
+    }
+
+    public synchronized int  getNewPicturesCount()
+    {
+        return (this.new_pictures_count);
     }
 
     public synchronized void setNewMessagesCount(int count)
@@ -70,53 +127,87 @@ public class ApplicationState extends Application
         this.new_messages_count = count;
     }
 
+    public synchronized void setNewPicturesCount(int count)
+    {
+        this.new_pictures_count = count;
+    }
+
     // get the toAddress
-    public String toAddress()
+    public synchronized String toAddress()
     {
         return this.toAddress;
     }
 
     // set the toAddress
-    public void toAddress(String toAddress)
+    public synchronized void toAddress(String toAddress)
     {
         this.toAddress = toAddress;
     }
 
     // get the caption
-    public String caption()
+    public synchronized String caption()
     {
         return this.caption;
     }
 
     // set the caption
-    public void caption(String caption)
+    public synchronized void caption(String caption)
     {
         this.caption = caption;
     }
 
+    // get the content settings
+    public synchronized String contentSettings()
+    {
+        return this.contentSettings;
+    }
+
+    // set the content settings
+    public synchronized void contentSettings(String contentSettings)
+    {
+        this.contentSettings = contentSettings;
+    }
+
 
     // get the ipAddress
-    public String ipAddress()
+    public synchronized String ipAddress()
     {
         return this.ipAddress;
     }
 
     // set the ipAddress
-    public void ipAddress(String ipAddress)
+    public synchronized void ipAddress(String ipAddress)
     {
         this.ipAddress = ipAddress;
     }
 
     // get the username
-    public String username()
+    public synchronized String username()
     {
         return this.username;
     }
 
     // set the username
-    public void username(String username)
+    public synchronized void username(String username)
     {
         this.username = username;
+    }
+
+    // get the password
+    public synchronized String password()
+    {
+        return this.password;
+    }
+
+    // set the password
+    public synchronized void password(String password)
+    {
+        this.password = password;
+    }
+
+    public synchronized String  getPictoPictureFilePrefix()
+    {
+        return (this.picto_pic_file_prefix);
     }
 
     public synchronized String  getPictoMsgFilePrefix()
@@ -137,6 +228,16 @@ public class ApplicationState extends Application
     public synchronized PictoClient  getPictoClient()
     {
         return (this.client);
+    }
+
+    public synchronized void  setLastMessage(MessageListItem lastMessage)
+    {
+        this.lastMessage = lastMessage;
+    }
+
+    public synchronized MessageListItem  getLastMessage()
+    {
+        return (this.lastMessage);
     }
 
     public synchronized void  setLastPicture(Bitmap bitmap_lastPicture)
@@ -179,14 +280,31 @@ public class ApplicationState extends Application
     }
 
 
-
-    public synchronized void historyToView(MessageListItem historyItem)
+    public synchronized void messageToDelete(String messageFilename)
     {
-        this.historyToView = historyItem;
+        this.messageFilenameToDelete = messageFilename;
     }
-    public synchronized MessageListItem historyToView()
+    public synchronized String messageToDelete()
     {
-        return(this.historyToView);
+        return(this.messageFilenameToDelete);
+    }
+
+    public synchronized void messageToView(MessageListItem messageItem)
+    {
+        this.messageToView = messageItem;
+    }
+    public synchronized MessageListItem messageToView()
+    {
+        return(this.messageToView);
+    }
+
+    public synchronized void pictureToView(MessageListItem messageItem)
+    {
+        this.pictureToView = messageItem;
+    }
+    public synchronized MessageListItem pictureToView()
+    {
+        return(this.pictureToView);
     }
 
     public static ApplicationState getApplicationStateInstance() {return singleton;}
@@ -271,15 +389,26 @@ public class ApplicationState extends Application
 
 
 
-    // History list
-    public synchronized Vector  getHistoryList()
+    // Message list
+    public synchronized Vector  getMessageList()
     {
-        return historyList;
+        return messageList;
     }
-    public synchronized void  addHistoryItem(MessageListItem  item)
+    public synchronized void  addMessageItem(MessageListItem  item)
     {
 
-        historyList.add(0,item); //add payload to the top of the list
+        messageList.add(0,item); //add message to the top of the list
+    }
+
+    // Picture list
+    public synchronized Vector  getPictureList()
+    {
+        return pictureList;
+    }
+    public synchronized void  addPictureItem(MessageListItem  item)
+    {
+
+        pictureList.add(0,item); //add picture to the top of the list
     }
 
     //Selected History list
@@ -296,7 +425,7 @@ public class ApplicationState extends Application
         selectedHistorys.clear();
     }
 
-
+/*
     public void LoadHistoryList()
     {
         File file = null;
@@ -311,7 +440,7 @@ public class ApplicationState extends Application
                 File[] files = file.listFiles();
                 ApplicationState.debugMessage( "Number of files :(" + files.length + ")");
 
-                getHistoryList().clear();
+                getMessageList().clear();
 
                 for(int x = 0; x<files.length; x++)
                 {
@@ -358,14 +487,15 @@ public class ApplicationState extends Application
 
     }
 
+*/
 
-    public void LoadHistoryListNew()
+    public synchronized void LoadPictureList()
     {
         File file = null;
         try
         {
             String path = getApplicationContext().getFilesDir().getPath().toString();
-            ApplicationState.debugMessage( "Messages files folder Path:(" + path + ")");
+            ApplicationState.debugMessage( "Pictures files folder Path:(" + path + ")");
             file = new File(path);
 
             if(file.exists() == true)
@@ -373,14 +503,24 @@ public class ApplicationState extends Application
                 File[] files = file.listFiles();
                 ApplicationState.debugMessage( "Number of files :(" + files.length + ")");
 
-                getHistoryList().clear();
+                getPictureList().clear();
 
                 for(int x = 0; x<files.length; x++)
                 {
                     String filename = files[x].getName();
-                    if(filename.startsWith(getPictoMsgFilePrefix())) {
+                    if(filename.startsWith(getPictoPictureFilePrefix())) {
                         ApplicationState.debugMessage("FileName:" + filename);
                         String fpath = files[x].getAbsolutePath();
+                        /************DELETE FILE****************/
+
+                        /*
+                        File deletefile = new File(fpath);
+                        if(deletefile.exists()) {
+                            deletefile.delete();
+                            continue;
+                        }
+*/
+
                         long size = files[x].length();
                         ApplicationState.debugMessage("Filepath:" + fpath);
                         ApplicationState.debugMessage("Filesize:" + Long.toString(size));
@@ -388,10 +528,10 @@ public class ApplicationState extends Application
                         // read the contents of the file
                         byte[] content = getByteArrayFromFile (fpath);
 
-                        MessageListItem newItem = bytesToHistoryItem(content);
+                        MessageListItem newItem = bytesToMessageItem(content);
 
                         /// add to top of the list
-                        addHistoryItem(newItem);
+                        addPictureItem(newItem);
                     }
                     else
                     {
@@ -417,7 +557,90 @@ public class ApplicationState extends Application
 
     }
 
-    public void addMessage(byte[] content, String caption)
+    public synchronized void LoadMessageList()
+    {
+        File file = null;
+        try
+        {
+            String path = getApplicationContext().getFilesDir().getPath().toString();
+            ApplicationState.debugMessage( "Messages files folder Path:(" + path + ")");
+            file = new File(path);
+
+            if(file.exists() == true)
+            {
+                File[] files = file.listFiles();
+                ApplicationState.debugMessage( "Number of files :(" + files.length + ")");
+
+                getMessageList().clear();
+
+                for(int x = 0; x<files.length; x++)
+                {
+                    String filename = files[x].getName();
+                    if(filename.startsWith(getPictoMsgFilePrefix())) {
+                        ApplicationState.debugMessage("FileName:" + filename);
+                        String fpath = files[x].getAbsolutePath();
+                        /*
+                        File deletefile = new File(fpath);
+                        if(deletefile.exists()) {
+                            deletefile.delete();
+                            continue;
+                        }
+*/
+
+                        long size = files[x].length();
+                        ApplicationState.debugMessage("Filepath:" + fpath);
+                        ApplicationState.debugMessage("Filesize:" + Long.toString(size));
+
+                        // read the contents of the file
+                        byte[] content = getByteArrayFromFile (fpath);
+
+                        MessageListItem newItem = bytesToMessageItem(content);
+
+                        /// add to top of the list
+                        addMessageItem(newItem);
+                    }
+                    else
+                    {
+                        ApplicationState.debugMessage("FileName IGNORED:" + filename);
+                    }
+                }
+
+            }
+
+
+        }
+
+        catch (Exception e)
+        {
+            String error = e.toString();
+            // do something with error
+            if(error == null)
+            {
+
+            }
+
+        }
+
+    }
+
+    public synchronized void addPicture(byte[] content, String caption)
+    {
+        MessageListItem newItem = null;
+        Date date = new Date();
+        String filename = getApplicationContext().getFilesDir().getPath().toString() + "/" + getPictoPictureFilePrefix() + Long.toString(date.getTime());
+
+        newItem = new MessageListItem(caption,filename); // create a new history item
+        newItem.content(content);
+
+        byte[] resultBytes = MessageItemToBytes(newItem);
+
+        addPictureItem(newItem); // add this new scan to the picture list
+        createFile(filename,resultBytes);
+
+        //new_messages_count++;
+    }
+
+    public synchronized void addMessage(byte[] content, String caption,String type,String contentSettings)
     {
         MessageListItem newItem = null;
         Date date = new Date();
@@ -425,16 +648,18 @@ public class ApplicationState extends Application
 
         newItem = new MessageListItem(caption,filename); // create a new history item
         newItem.content(content);
+        newItem.type(type);
+        newItem.contentSettings(contentSettings);
 
-        byte[] resultBytes = historyItemToBytes(newItem);
+        byte[] resultBytes = MessageItemToBytes(newItem);
 
-        addHistoryItem(newItem); // add this new scan to the history list
-        createHistoryFile(filename,resultBytes);
+        addMessageItem(newItem); // add this new scan to the message list
+        createFile(filename,resultBytes);
 
         //new_messages_count++;
     }
 
-    public static String convertStreamToString(InputStream is) throws Exception {
+    public synchronized static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
         String line = null;
@@ -445,7 +670,7 @@ public class ApplicationState extends Application
         return sb.toString();
     }
 
-    public static String getStringFromFile (String filePath) throws Exception {
+    public synchronized static String getStringFromFile (String filePath) throws Exception {
         File fl = new File(filePath);
         FileInputStream fin = new FileInputStream(fl);
         String ret = convertStreamToString(fin);
@@ -454,7 +679,7 @@ public class ApplicationState extends Application
         return ret;
     }
 
-    public static byte[] getByteArrayFromFile (String filePath) throws Exception {
+    public synchronized static byte[] getByteArrayFromFile (String filePath) throws Exception {
         File file = new File(filePath);
 
         byte[] bFile = new byte[(int) file.length()];
@@ -470,7 +695,7 @@ public class ApplicationState extends Application
         return bFile;
     }
 
-    byte[] historyItemToBytes(MessageListItem item)
+    synchronized byte[] MessageItemToBytes(MessageListItem item)
     {
         byte[] resultBytes = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -501,7 +726,7 @@ public class ApplicationState extends Application
         return(resultBytes);
     }
 
-    MessageListItem bytesToHistoryItem(byte[] itemBytes)
+    synchronized  MessageListItem bytesToMessageItem(byte[] itemBytes)
     {
         MessageListItem item = null;
         ByteArrayInputStream bis = new ByteArrayInputStream(itemBytes);
@@ -528,7 +753,7 @@ public class ApplicationState extends Application
         return item;
     }
 
-    public void createHistoryFile(String filename, String content)
+    public synchronized void createFile(String filename, String content)
     {
         File file;
         file = new File(filename);
@@ -555,7 +780,7 @@ public class ApplicationState extends Application
         }
     }
 
-    public void createHistoryFile(String filename, byte[] content)
+    public synchronized void createFile(String filename, byte[] content)
     {
         File file;
         file = new File(filename);
@@ -578,7 +803,7 @@ public class ApplicationState extends Application
         }
     }
 
-    public static void delete_File(String filename)
+    public synchronized static void delete_File(String filename)
     {
 
         boolean deleted;
@@ -603,7 +828,7 @@ public class ApplicationState extends Application
 
 
     //  exits activity.
-    public void exitApplication()
+    public synchronized void exitApplication()
     {
         // This will clear the activity list and put the main activity at the top.
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -613,6 +838,28 @@ public class ApplicationState extends Application
         startActivity(intent);
 
 
+    }
+
+    public static byte[] encrypt(byte[] input, byte[] key) throws Exception
+    {
+        SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+        return cipher.doFinal(input);
+    }
+
+    public static byte[] decrypt(byte[] input, byte[] key) throws Exception
+    {
+        try {
+            SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec);
+            return cipher.doFinal(input);
+        }
+        catch(Exception e)
+        {
+            throw e;
+        }
     }
 
 }

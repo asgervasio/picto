@@ -8,6 +8,7 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ public class SettingsActivity extends AppCompatActivity {
     ApplicationState applicationState = null;
     EditText  editText_IP_Address;
     EditText  editText_username;
+    CheckBox checkBox_displayDebug;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         editText_username = (EditText)findViewById(R.id.editText_username);
 
+        checkBox_displayDebug = (CheckBox)findViewById(R.id.checkBox_displayDebug);
+        checkBox_displayDebug.setChecked(applicationState.debugEnabled());
+
 
         Button button= (Button) findViewById(R.id.button_save);
         button.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +74,8 @@ public class SettingsActivity extends AppCompatActivity {
                // get username and IP address
                 applicationState.ipAddress(editText_IP_Address.getText().toString());
                 applicationState.username(editText_username.getText().toString());
+                applicationState.debugEnabled(checkBox_displayDebug.isChecked()); // this isn't saved, it's used during session.
+
 
                 PictoSettings settings = new PictoSettings(editText_IP_Address.getText().toString(),editText_username.getText().toString());
                 byte[] settingsBytes = settings.pictoSettingsToBytes(settings);
@@ -76,7 +83,7 @@ public class SettingsActivity extends AppCompatActivity {
                 // save byte array to file
                 String filename = getApplicationContext().getFilesDir().getPath().toString() + "/" + applicationState.getPictoSettingsFilename();
 
-                applicationState.createHistoryFile(filename,settingsBytes);
+                applicationState.createFile(filename,settingsBytes);
 
                 showSettingsSavedDialogButtonClicked(v);
             }
@@ -108,7 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication\n", "com.picto.ycpcs.myapplication.CameraActivity\n"));
+        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
     }
 
     public void showSettingsSavedDialogButtonClicked(View view) {

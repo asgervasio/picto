@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="com.cs381.picto.SettingsActivity">
+    tools:context="com.picto.ycpcs.myapplication.SettingsActivity">
 
     <EditText
         android:id="@+id/editText_IP_Address"
@@ -26,6 +26,12 @@
         android:ems="10"
         android:hint="User name"
         android:inputType="textPersonName" />
+
+    <CheckBox
+        android:text="DisplayDebug"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkBox_displayDebug" />
 
     <Button
         android:id="@+id/button_save"

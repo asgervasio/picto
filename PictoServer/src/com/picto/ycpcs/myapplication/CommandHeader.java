@@ -75,7 +75,7 @@ public class CommandHeader {
     }
 
     // set the commandType
-    public void payloadSize(int payloadSize)
+    public synchronized void payloadSize(int payloadSize)
     {
         this.payloadSize = payloadSize;
     }
