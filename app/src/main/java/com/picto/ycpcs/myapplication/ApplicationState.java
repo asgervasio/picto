@@ -427,7 +427,70 @@ public class ApplicationState extends Application
     {
         selectedHistorys.clear();
     }
-    
+
+/*
+    public void LoadHistoryList()
+    {
+        File file = null;
+        try
+        {
+            String path = getApplicationContext().getFilesDir().getPath().toString();
+            ApplicationState.debugMessage( "History files folder Path:(" + path + ")");
+            file = new File(path);
+
+            if(file.exists() == true)
+            {
+                File[] files = file.listFiles();
+                ApplicationState.debugMessage( "Number of files :(" + files.length + ")");
+
+                getMessageList().clear();
+
+                for(int x = 0; x<files.length; x++)
+                {
+                    String filename = files[x].getName();
+                    if(filename.startsWith(getPictoMsgFilePrefix())) {
+                        ApplicationState.debugMessage("FileName:" + filename);
+                        String fpath = files[x].getAbsolutePath();
+                        long size = files[x].length();
+                        ApplicationState.debugMessage("Filepath:" + fpath);
+                        ApplicationState.debugMessage("Filesize:" + Long.toString(size));
+
+                        // read the contents of the file
+                        String content = getStringFromFile(fpath);  //reads the entire file as a string.
+
+
+                        ApplicationState.debugMessage("content:" + content);
+
+                        ApplicationState.debugMessage("Add HistoryItem Filename:(" + fpath + ") Contents:" + content);
+                        MessageListItem newItem = new MessageListItem(content, fpath);
+                        /// add to top of the list
+                        addHistoryItem(newItem);
+                    }
+                    else
+                    {
+                        ApplicationState.debugMessage("FileName IGNORED:" + filename);
+                    }
+                }
+
+            }
+
+
+        }
+
+        catch (Exception e)
+        {
+            String error = e.toString();
+            // do something with error
+            if(error == null)
+            {
+
+            }
+
+        }
+
+    }
+
+*/
 
     public synchronized void LoadPictureList()
     {

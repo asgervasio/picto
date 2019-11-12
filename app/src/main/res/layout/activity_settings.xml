@@ -25,8 +25,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="User name"
-        android:inputType="textPersonName"
-        android:digits="abcdefghijklmnopqrstuvwxyz1234567890" />
+        android:inputType="textPersonName" />
 
     <CheckBox
         android:text="DisplayDebug"
@@ -39,12 +38,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save" />
-
-    <Button
-        android:text="Clean up"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button_clean_files" />
-
 
 </LinearLayout>
