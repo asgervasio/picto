@@ -33,11 +33,7 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-<<<<<<< HEAD
-        setContentView(R.layout.content_camera);
-=======
         setContentView(R.layout.activity_camera);
->>>>>>> master
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -45,7 +41,6 @@ public class CameraActivity extends AppCompatActivity {
         //Toast.makeText(MainActivity.this, "Picto app started", Toast.LENGTH_LONG).show();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        /*
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,11 +48,10 @@ public class CameraActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        */
 
         // get global data reference
-        //applicationState = ((ApplicationState)getApplicationContext());
-        //applicationState.setParentActivity(this);
+        applicationState = ((ApplicationState)getApplicationContext());
+        applicationState.setParentActivity(this);
 
         loadSettings(); // load user settings
     }
