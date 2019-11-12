@@ -16,8 +16,8 @@ public class IO_Thread extends Thread {
     Socket socket = null;
     
     InputStream inp = null;
-    BufferedInputStream buf_in_stream = null; // buffered input stream. brinp
-    BufferedOutputStream buf_out_stream = null;  // buffered output stream
+    BufferedInputStream brinp = null; // buffered input stream
+    BufferedOutputStream out = null;  // buffered output stream
     byte[] readHeaderBuffer = null;  // byte buffer for the header used when reading messages
     
     ApplicationState appstate = null;  // reference to the applications global memory
@@ -45,14 +45,14 @@ public class IO_Thread extends Thread {
 
             // get input stream
         	inp = socket.getInputStream();
-            buf_in_stream = new BufferedInputStream(inp);
+            brinp = new BufferedInputStream(inp);
             // get output stream
-            buf_out_stream = new BufferedOutputStream(socket.getOutputStream());
+            out = new BufferedOutputStream(socket.getOutputStream());
             rv = true;
         } 
         catch (IOException e) 
         {
-            //appstate.addStatusMessage(", iothread connect exception ");
+            appstate.addStatusMessage(", iothread connect exception ");
             //appstate.lastStatusMessage = appstate.lastStatusMessage + ", iothread connect exception ";
             rv = false;
             disconnect(true);
@@ -87,14 +87,14 @@ public class IO_Thread extends Thread {
         try
         {
             // close BufferedInputStream
-            if(buf_in_stream != null)
+            if(brinp != null)
             {
-                buf_in_stream.close();
+                brinp.close();
             }
             // close BufferedOutputStream
-            if(buf_out_stream != null)
+            if(out != null)
             {
-                buf_out_stream.close();
+                out.close();
             }
             // close socket
             if(socket != null)
@@ -141,11 +141,11 @@ public class IO_Thread extends Thread {
             CommandHeader header = new CommandHeader(CommandHeader.SIGNATURE,CommandHeader.CMD_SEND_MSG,CommandHeader.VERSION,CommandHeader.STATUS_SUCCESS,messageBytes.length);
 			// export and send the header bytes to the socket stream
 			byte[] headerBytes = header.exportHeader();
-            buf_out_stream.write(headerBytes);
-            buf_out_stream.flush();
+			out.write(headerBytes);
+        	out.flush();
         	// send the message bytes to the socket stream
-            buf_out_stream.write(messageBytes);
-            buf_out_stream.flush();
+        	out.write(messageBytes);
+        	out.flush();
 
         	//System.out.println("Send Message - From: " + msg.fromAddress() + " To: " + msg.toAddress() + " Message text:  "+ msg.textMessage() + " image filename: " + msg.contentFileName());
 
@@ -154,145 +154,19 @@ public class IO_Thread extends Thread {
         } 
         catch (Exception e)
         {
-
-            //appstate.addStatusMessage(", SEND MSG exception ");
+            //e.printStackTrace();
+            //appstate.lastStatusMessage = appstate.lastStatusMessage + ", SEND MSG exception ";
+            appstate.addStatusMessage(", SEND MSG exception ");
             disconnect(true);
-
+            //rv = false;
             throw e;
             
         }	
 		
 		return rv;
 	}
-
-    public synchronized PictoMessage ReceiveMsgFromServer() throws Exception
-    {
-
-        int tryCount = 0;
-        PictoMessage msg = null;
-        byte[] receivedMessage;
-        CommandHeader header;
-        int availSize;
-
-        try
-        {
-            // CREATE a message read request
-            //appstate.addStatusMessage(", create READ MSG req ");
-            // Create a read message object, it is just an empty message with the from field set to the username requesting the mail
-            PictoMessage message = new PictoMessage(appstate.username(),"","","");
-            //appstate.addStatusMessage(", bfr pictoMessageToBytes ");
-            byte[] messageBytes = PictoMessage.pictoMessageToBytes(message);
-            //appstate.addStatusMessage(", after pictoMessageToBytes ");
-            // create the read message command header
-            header = new CommandHeader(CommandHeader.SIGNATURE,CommandHeader.CMD_READ_MSG,CommandHeader.VERSION,CommandHeader.STATUS_SUCCESS,messageBytes.length);
-            byte[] headerBytes = header.exportHeader();
-            //appstate.addStatusMessage(", after exportHeader ");
-            // write the header
-            buf_out_stream.write(headerBytes);  // exception occurs here...
-            buf_out_stream.flush();
-            //appstate.addStatusMessage(", after Header fl ");
-            // write the message
-            buf_out_stream.write(messageBytes);
-            buf_out_stream.flush();
-            //appstate.addStatusMessage(", after msg fl ");
-
-            Thread.sleep(100);
-            //appstate.addStatusMessage(", after sleep ");
-        }
-        catch (Exception e)
-        {
-            //appstate.addStatusMessage(", READ MSG request exception ");
-
-            disconnect(true);
-            throw e;
-        }
-
-        // after we send the READ request, look for any received messages
-        while(tryCount < 3)
-        {
-            try
-            {
-                // check for any recieved messages
-                if(buf_in_stream.available() > 0)
-                {
-                    while((availSize = buf_in_stream.available()) < CommandHeader.HEADER_SIZE)
-                    {
-                        //System.out.println("!!!!!!!!!!!!! COMMAND header not enough bytes, available size = " + availSize + " expecting size = " + CommandHeader.HEADER_SIZE);
-                        Thread.sleep(100);
-                    }
-                    // get the header data from the socket stread
-                    buf_in_stream.read(readHeaderBuffer);
-                    // create a blank Command header object, it will be filled when we import the data we just read
-                    header = new CommandHeader(0,0,0,0,0);
-                    // import the buffer we just read into the command header object
-                    header.importHeader(readHeaderBuffer);
-                    if(header.signature() != CommandHeader.SIGNATURE)
-                    {
-                        // corrupted header so flush the input stream.
-                        //appstate.addStatusMessage(", sig expected " + Integer.toHexString(CommandHeader.SIGNATURE));
-                        //appstate.addStatusMessage(", sig found " + Integer.toHexString(header.signature()));
-                        int readsize = buf_in_stream.available();
-                        if(readsize  > 0)
-                        {
-                            //appstate.addStatusMessage("UNKNOWN stream not empty " + Integer.toString(readsize));
-                            byte[] tempbuf = new byte[readsize];
-                            buf_in_stream.read(tempbuf);
-                            //appstate.addStatusMessage("UNKNOWN stream read " );
-
-                        }
-                        msg = null;
-                        break;
-
-                    }
-
-                    // if we get to this point we have a header that looks valid
-                    if(header.payloadSize() > 0)
-                    {
-                        //appstate.addStatusMessage("expecting payload of size = " + Integer.toString(header.payloadSize()));
-                        while((availSize = buf_in_stream.available()) < header.payloadSize())
-                        {
-                            //appstate.addStatusMessage(" CMD payload not enough bytes, available size = " + availSize + " expected PAYLOAD size = " + header.payloadSize());
-                            Thread.sleep(500);
-                        }
-                    }
-                    // allocate buffer for the message object
-                    receivedMessage = new byte[header.payloadSize()];
-                    // get message data from the stream
-                    buf_in_stream.read(receivedMessage);
-                    //appstate.addStatusMessage(", before btm " + Integer.toString(receivedMessage.length));
-
-                    // convert the message buffer to message object
-                    msg =  PictoMessage.bytesToPictoMessage(receivedMessage);
-                    //appstate.addStatusMessage(", after btm ");
-
-                    break;
-
-                }
-                else
-                {
-                    tryCount++;
-
-                }
-
-                Thread.sleep(500);
-
-            }
-            catch (Exception e)
-            {
-
-                //appstate.addStatusMessage(", READ MSG receive exception ");
-
-                disconnect(true);
-
-                throw e;
-
-            }
-        }
-
-        return msg;
-    }
 	
-	public synchronized PictoMessage ReceiveMsgFromServerOLD() throws Exception
+	public synchronized PictoMessage ReceiveMsgFromServer() throws Exception
 	{
 		
 		int tryCount = 0;
@@ -303,32 +177,32 @@ public class IO_Thread extends Thread {
 		try 
         {
 			// CREATE a message read request
-            //appstate.addStatusMessage(", create READ MSG req ");
+            appstate.addStatusMessage(", create READ MSG req ");
 			// Create a read message object, it is just an empty message with the from field set to the username requesting the mail
             PictoMessage message = new PictoMessage(appstate.username(),"","","");
-            //appstate.addStatusMessage(", bfr pictoMessageToBytes ");
+            appstate.addStatusMessage(", bfr pictoMessageToBytes ");
 			byte[] messageBytes = PictoMessage.pictoMessageToBytes(message);
-            //appstate.addStatusMessage(", after pictoMessageToBytes ");
+            appstate.addStatusMessage(", after pictoMessageToBytes ");
             // create the read message command header
 			header = new CommandHeader(CommandHeader.SIGNATURE,CommandHeader.CMD_READ_MSG,CommandHeader.VERSION,CommandHeader.STATUS_SUCCESS,messageBytes.length);
 			byte[] headerBytes = header.exportHeader();
-            //appstate.addStatusMessage(", after exportHeader ");
+            appstate.addStatusMessage(", after exportHeader ");
             // write the header
-            buf_out_stream.write(headerBytes);  // exception occurs here...
-            buf_out_stream.flush();
-            //appstate.addStatusMessage(", after Header fl ");
+			out.write(headerBytes);  // exception occurs here...
+	    	out.flush();
+            appstate.addStatusMessage(", after Header fl ");
 	    	// write the message
-            buf_out_stream.write(messageBytes);
-            buf_out_stream.flush();
-            //appstate.addStatusMessage(", after msg fl ");
+	    	out.write(messageBytes);
+	    	out.flush();
+            appstate.addStatusMessage(", after msg fl ");
 	    	
 	    	Thread.sleep(100);
-            //appstate.addStatusMessage(", after sleep ");
+            appstate.addStatusMessage(", after sleep ");
         }
 		catch (Exception e) 
         {
-            //appstate.addStatusMessage(", READ MSG request exception ");
-
+            appstate.addStatusMessage(", READ MSG request exception ");
+            //appstate.lastStatusMessage = appstate.lastStatusMessage + ", READ MSG request exception ";
             disconnect(true);
             throw e;
         }
@@ -339,10 +213,10 @@ public class IO_Thread extends Thread {
 			try 
 	        {
 	        	// check for any recieved messages
-	        	if(buf_in_stream.available() > 0)
+	        	if(brinp.available() > 0)
 	        	{
 	        		// get the header data from the socket stread
-                    buf_in_stream.read(readHeaderBuffer);
+		        	brinp.read(readHeaderBuffer);
                     // create a blank Command header object, it will be filled when we import the data we just read
 		        	header = new CommandHeader(0,0,0,0,0);
                     // import the buffer we just read into the command header object
@@ -350,15 +224,15 @@ public class IO_Thread extends Thread {
                     if(header.signature() != CommandHeader.SIGNATURE)
                     {
                         // corrupted header so flush the input stream.
-                        //appstate.addStatusMessage(", sig expected " + Integer.toHexString(CommandHeader.SIGNATURE));
-                        //appstate.addStatusMessage(", sig found " + Integer.toHexString(header.signature()));
-                        int readsize = buf_in_stream.available();
+                        appstate.addStatusMessage(", sig expected " + Integer.toHexString(CommandHeader.SIGNATURE));
+                        appstate.addStatusMessage(", sig found " + Integer.toHexString(header.signature()));
+                        int readsize = brinp.available();
                         if(readsize  > 0)
                         {
-                            //appstate.addStatusMessage("UNKNOWN stream not empty " + Integer.toString(readsize));
+                            appstate.addStatusMessage("UNKNOWN stream not empty " + Integer.toString(readsize));
                             byte[] tempbuf = new byte[readsize];
-                            buf_in_stream.read(tempbuf);
-                            //appstate.addStatusMessage("UNKNOWN stream read " );
+                            brinp.read(tempbuf);
+                            appstate.addStatusMessage("UNKNOWN stream read " );
 
                         }
                         msg = null;
@@ -368,13 +242,13 @@ public class IO_Thread extends Thread {
 		        	// allocate buffer for the message object
 		        	receivedMessage = new byte[header.payloadSize()];
 		        	// get message data from the stream
-                    buf_in_stream.read(receivedMessage);
-                    //appstate.addStatusMessage(", before btm " + Integer.toString(receivedMessage.length));
-
+		        	brinp.read(receivedMessage);
+                    appstate.addStatusMessage(", before btm " + Integer.toString(receivedMessage.length));
+                    //appstate.lastStatusMessage = appstate.lastStatusMessage + ", before btm " + Integer.toString(receivedMessage.length);
 		        	// convert the message buffer to message object
 		        	msg =  PictoMessage.bytesToPictoMessage(receivedMessage);
-                    //appstate.addStatusMessage(", after btm ");
-
+                    appstate.addStatusMessage(", after btm ");
+                   // appstate.lastStatusMessage = appstate.lastStatusMessage + ", after btm ";
 		        	//System.out.println("Read - From: " + msg.fromAddress() + " To: " + msg.toAddress() + " Message text:  "+ msg.textMessage() + " image filename: " + msg.contentFileName());
 		        	
 		        	break;
@@ -391,11 +265,11 @@ public class IO_Thread extends Thread {
 	        } 
 	        catch (Exception e) 
 	        {
-
-                //appstate.addStatusMessage(", READ MSG receive exception ");
-
+	            //e.printStackTrace();
+                appstate.addStatusMessage(", READ MSG receive exception ");
+                //appstate.lastStatusMessage = appstate.lastStatusMessage + ", READ MSG receive exception ";
                 disconnect(true);
-
+                //break;
                 throw e;
 	            
 	        }
@@ -417,8 +291,8 @@ public class IO_Thread extends Thread {
             CommandHeader header = new CommandHeader(CommandHeader.SIGNATURE,CommandHeader.CMD_PING_MSG,CommandHeader.VERSION,CommandHeader.STATUS_SUCCESS,0);
 
             byte[] headerBytes = header.exportHeader();
-            buf_out_stream.write(headerBytes);
-            buf_out_stream.flush();
+            out.write(headerBytes);
+            out.flush();
 
             System.out.println("Ping Server ");
 
@@ -431,10 +305,10 @@ public class IO_Thread extends Thread {
 
                     // check for any recieved messages
 
-                    if(buf_in_stream.available() > 0)
+                    if(brinp.available() > 0)
                     {
                         // get the header
-                        buf_in_stream.read(readHeaderBuffer);
+                        brinp.read(readHeaderBuffer);
                         header = new CommandHeader(0,0,0,0,0);
                         header.importHeader(readHeaderBuffer);
                         switch(header.commandType())
@@ -520,11 +394,11 @@ public class IO_Thread extends Thread {
             byte[] messageBytes = PictoMessage.pictoMessageToBytes(message);
             header = new CommandHeader(CommandHeader.SIGNATURE,CommandHeader.CMD_LOGIN_MSG,CommandHeader.VERSION,CommandHeader.STATUS_SUCCESS,messageBytes.length);
             byte[] headerBytes = header.exportHeader();
-            buf_out_stream.write(headerBytes);
-            buf_out_stream.flush();
+            out.write(headerBytes);
+            out.flush();
 
-            buf_out_stream.write(messageBytes);
-            buf_out_stream.flush();
+            out.write(messageBytes);
+            out.flush();
 
             Thread.sleep(100);
         }
@@ -541,10 +415,10 @@ public class IO_Thread extends Thread {
 
                 // check for Login response message
 
-                if(buf_in_stream.available() > 0)
+                if(brinp.available() > 0)
                 {
                     // get the header
-                    buf_in_stream.read(readHeaderBuffer);
+                    brinp.read(readHeaderBuffer);
                     header = new CommandHeader(0,0,0,0,0);
                     header.importHeader(readHeaderBuffer);
                     switch(header.commandType())
@@ -643,19 +517,19 @@ public class IO_Thread extends Thread {
                         if (message != null) {
                             // if messages to receive
                             // copy message to received message List
-                            //appstate.addStatusMessage(", add msg ");
-
-                            appstate.addMessage(message.fromAddress(), message.content(), message.textMessage(),appstate.picto_msg_type_Received,message.contentSettings());
-
-                            //appstate.addStatusMessage(", aft add msg ");
-                            //appstate.addStatusMessage(", msgtimeout =  " + message.contentSettings());
+                            appstate.addStatusMessage(", add msg ");
+                            //appstate.lastStatusMessage = appstate.lastStatusMessage + ", add msg ";
+                            appstate.addMessage(message.content(), message.textMessage(),appstate.picto_msg_type_Received,message.contentSettings());
+                            //appstate.lastStatusMessage = appstate.lastStatusMessage + ", aft add msg ";
+                            appstate.addStatusMessage(", aft add msg ");
+                            appstate.addStatusMessage(", msgtimeout =  " + message.contentSettings());
                             // increment the new message counter
                             appstate.setNewMessagesCount(appstate.getNewMessagesCount() + 1);
-                            //appstate.addStatusMessage(", set m cnt ");
-
+                            appstate.addStatusMessage(", set m cnt ");
+                            //appstate.lastStatusMessage = appstate.lastStatusMessage + ", set m cnt ";
                             Beep(); // alert user that a new message has been received
-
-                            //appstate.addStatusMessage(", aft beep ");
+                            //appstate.lastStatusMessage = appstate.lastStatusMessage + ", aft bep ";
+                            appstate.addStatusMessage(", aft beep ");
                         }
 
                     }
@@ -671,14 +545,15 @@ public class IO_Thread extends Thread {
 			}
 			catch (Exception e)
 			{
-                //appstate.addStatusMessage(", IO thread exception ");
-
+                appstate.addStatusMessage(", IO thread exception ");
+                //appstate.lastStatusMessage = appstate.lastStatusMessage + ", IO thread exception ";
+				//return;
                 break;
 			}
 		}
         // if the thread exits then there must of been a problem communicating with the server.
-        //appstate.addStatusMessage(", IO thread ended ");
-
+        appstate.addStatusMessage(", IO thread ended ");
+        //appstate.lastStatusMessage = appstate.lastStatusMessage + ", IO thread ended ";
         disconnect(true); // disconnect and show login activty
 		
 	}
@@ -695,6 +570,25 @@ public class IO_Thread extends Thread {
         toneG.startTone(ToneGenerator.TONE_PROP_BEEP);
 
     }
+/*
+    // plays a single beep to the android speaker
+    public static void SoundConnectionLost() {
+        ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+        try {
+            toneG.startTone(ToneGenerator.TONE_DTMF_D);
+            Thread.sleep(100);
+            toneG.startTone(ToneGenerator.TONE_DTMF_3);
+            Thread.sleep(100);
+            toneG.startTone(ToneGenerator.TONE_DTMF_A);
+            Thread.sleep(100);
+            toneG.startTone(ToneGenerator.TONE_DTMF_D);
+        }
+        catch(Exception e)
+        {
 
+        }
+
+    }
+    */
 
 }

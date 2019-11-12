@@ -46,9 +46,7 @@ public class PictureListActivity extends AppCompatActivity {
         pictureListView.setItemsCanFocus(false);
         pictureListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE); // CHOICE_MODE_MULTIPLE
 
-        if(applicationState.username().length() > 0) {
-            setTitle("Picto (" + applicationState.username() + ")");
-        }
+
         applicationState.LoadPictureList();
 
         Vector pictureList = applicationState.getPictureList();
@@ -88,7 +86,7 @@ public class PictureListActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+        startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
     }
 
     @Override
@@ -150,6 +148,7 @@ public class PictureListActivity extends AppCompatActivity {
                 else {
                     SetPictureToSend();
                     intent = new Intent();
+                    //intent.setClassName("com.cs381.picto", "com.cs381.picto.PictureViewActivity");
                     intent.setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.MessageSendSaveActivity");
                     startActivity(intent);
                 }
@@ -280,7 +279,7 @@ public class PictureListActivity extends AppCompatActivity {
 
                 applicationState.setLastMessage(theItem);
                 //DECODE PNG to Bitmap and set last picture
-                pngToBitmapSetLastPicture(pngImage,theItem);
+                pngToBitmapSetLastPicture(pngImage);
                 //applicationState.setLastPicture(bitmap);
                 //applicationState.pictureToView(theItem);
 
@@ -290,42 +289,23 @@ public class PictureListActivity extends AppCompatActivity {
 
     }
 
-    public void  pngToBitmapSetLastPicture(final byte[] pngImage,final MessageListItem theItem)
+    public void  pngToBitmapSetLastPicture(final byte[] pngImage)
     {
         // this needs to be run in its own thread because the compression can take some time and
         // we don't want to stall the GUI thread.
         runOnUiThread(new Runnable() {
             public void run() {
-
-
-                //byte[] key = applicationState.AES_key_128;
-                byte[] key = applicationState.makeEncryptKey(applicationState.username(),theItem.name());
-                String byteString = applicationState.bytesToHex(key);
-                applicationState.addStatusMessage(",pngToBitmapSetLastPicture username =" + applicationState.username() + ", caption =" + theItem.name() + ", key = " + byteString);
-
-
-                try {
-                    Bitmap bitmap = applicationState.decryptBitmap(pngImage, key);
-
-                    applicationState.setLastPicture(bitmap);
-
-                }
-                catch(Exception e)
-                {
-
-                }
- /*
                 //DECODE
                 Bitmap compressed_bitmap = BitmapFactory.decodeByteArray(pngImage,0,pngImage.length);
-
+                //Bitmap bitmap = BitmapFactory.decodeFile("/path/images/image.jpg");
                 ByteArrayOutputStream blob = new ByteArrayOutputStream();
-                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 , blob);
+                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 /* Ignored for PNGs */, blob);
                 byte[] bitmapdata = blob.toByteArray();
 
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
                 applicationState.setLastPicture(bitmap);
-*/
+
 
             }
         });

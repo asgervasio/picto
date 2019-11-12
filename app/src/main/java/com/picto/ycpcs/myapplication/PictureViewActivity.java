@@ -42,39 +42,21 @@ public class PictureViewActivity extends AppCompatActivity {
         byte[] pngImage = theMessageItem.content();
 
         //DECODE PNG to Bitmap and display image
-        pngToBitmap(pngImage, theMessageItem);
+        pngToBitmap(pngImage);
 
     }
 
-    public void  pngToBitmap(final byte[] pngImage, final MessageListItem theItem)
+    public void  pngToBitmap(final byte[] pngImage)
     {
         // this needs to be run in its own thread because the compression can take some time and
         // we don't want to stall the GUI thread.
         runOnUiThread(new Runnable() {
             public void run() {
-
-                //byte[] key = applicationState.AES_key_128;
-                byte[] key = applicationState.makeEncryptKey(applicationState.username(),theItem.name());
-                String byteString = applicationState.bytesToHex(key);
-                applicationState.addStatusMessage(",pngToBitmap username =" + applicationState.username() + ", caption =" + theItem.name() + ", key = " + byteString);
-
-                try {
-                    Bitmap bitmap = applicationState.decryptBitmap(pngImage, key);
-
-                    imageView.setImageBitmap(bitmap);
-
-                    applicationState.pictureToView(null);
-                }
-                catch(Exception e)
-                {
-
-                }
- /*   old code
                 //DECODE
                 Bitmap compressed_bitmap = BitmapFactory.decodeByteArray(pngImage,0,pngImage.length);
                 //Bitmap bitmap = BitmapFactory.decodeFile("/path/images/image.jpg");
                 ByteArrayOutputStream blob = new ByteArrayOutputStream();
-                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 , blob);
+                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 /* Ignored for PNGs */, blob);
                 byte[] bitmapdata = blob.toByteArray();
 
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
@@ -82,7 +64,6 @@ public class PictureViewActivity extends AppCompatActivity {
                 imageView.setImageBitmap(bitmap);
 
                 applicationState.pictureToView(null);
-                */
             }
         });
 

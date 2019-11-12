@@ -5,7 +5,6 @@ import android.app.Application;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.SystemClock;
 
 
@@ -83,8 +82,6 @@ public class ApplicationState extends Application
 
     static String lastStatusMessage = "";
     static boolean debugEnabled = false;
-    static final byte[] AES_key_128 = new byte[] { (byte)0xe4, (byte)0x35, (byte)0xa1, (byte)0x20, (byte)0x79, (byte)0x01, (byte)0x85, (byte)0xff, (byte)0x07, (byte)0xc2, (byte)0x7a, (byte)0x11, (byte)0xb9, (byte)0x22, (byte)0x3f, (byte)0x68 };
-    static byte[] unique_key_128 = new byte[16];
 
     public void debugEnabled(boolean debugEnabled)
     {
@@ -218,9 +215,9 @@ public class ApplicationState extends Application
         return (this.picto_msg_file_prefix);
     }
 
-    static public synchronized String  getPictoSettingsFilename()
+    public synchronized String  getPictoSettingsFilename()
     {
-        return (pictoSettingsFilename); // return (this.pictoSettingsFilename);
+        return (this.pictoSettingsFilename);
     }
 
     public synchronized void  setPictoClient(PictoClient client)
@@ -514,6 +511,16 @@ public class ApplicationState extends Application
                     if(filename.startsWith(getPictoPictureFilePrefix())) {
                         ApplicationState.debugMessage("FileName:" + filename);
                         String fpath = files[x].getAbsolutePath();
+                        /************DELETE FILE****************/
+
+                        /*
+                        File deletefile = new File(fpath);
+                        if(deletefile.exists()) {
+                            deletefile.delete();
+                            continue;
+                        }
+*/
+
                         long size = files[x].length();
                         ApplicationState.debugMessage("Filepath:" + fpath);
                         ApplicationState.debugMessage("Filesize:" + Long.toString(size));
@@ -570,17 +577,16 @@ public class ApplicationState extends Application
                 {
                     String filename = files[x].getName();
                     if(filename.startsWith(getPictoMsgFilePrefix())) {
-
                         ApplicationState.debugMessage("FileName:" + filename);
                         String fpath = files[x].getAbsolutePath();
-
-/*
-                        File fileToDelete = new File(fpath);
-                        if(fileToDelete.exists()) {
-                            fileToDelete.delete();
+                        /*
+                        File deletefile = new File(fpath);
+                        if(deletefile.exists()) {
+                            deletefile.delete();
                             continue;
                         }
 */
+
                         long size = files[x].length();
                         ApplicationState.debugMessage("Filepath:" + fpath);
                         ApplicationState.debugMessage("Filesize:" + Long.toString(size));
@@ -593,62 +599,6 @@ public class ApplicationState extends Application
                         /// add to top of the list
                         addMessageItem(newItem);
                     }
-                    else
-                    {
-                        ApplicationState.debugMessage("FileName IGNORED:" + filename);
-                    }
-                }
-
-            }
-
-
-        }
-
-        catch (Exception e)
-        {
-            String error = e.toString();
-            // do something with error
-            if(error == null)
-            {
-
-            }
-
-        }
-
-    }
-
-    public synchronized void CleanupFiles()
-    {
-        File file = null;
-        try
-        {
-            String path = getApplicationContext().getFilesDir().getPath().toString();
-            ApplicationState.debugMessage( "Messages files folder Path:(" + path + ")");
-            file = new File(path);
-
-            if(file.exists() == true)
-            {
-                File[] files = file.listFiles();
-                ApplicationState.debugMessage( "Number of files :(" + files.length + ")");
-
-                for(int x = 0; x<files.length; x++)
-                {
-                    String filename = files[x].getName();
-                    if(filename.startsWith(getPictoMsgFilePrefix())  || filename.startsWith(getPictoPictureFilePrefix()))
-                    {
-
-                        //ApplicationState.debugMessage("FileName:" + filename);
-                        String fpath = files[x].getAbsolutePath();
-
-                        File fileToDelete = new File(fpath);
-                        if(fileToDelete.exists())
-                        {
-                            fileToDelete.delete();
-                            continue;
-                        }
-
-                    }
-
                     else
                     {
                         ApplicationState.debugMessage("FileName IGNORED:" + filename);
@@ -690,7 +640,7 @@ public class ApplicationState extends Application
         //new_messages_count++;
     }
 
-    public synchronized void addMessage(String fromAddress,byte[] content, String caption,String type,String contentSettings)
+    public synchronized void addMessage(byte[] content, String caption,String type,String contentSettings)
     {
         MessageListItem newItem = null;
         Date date = new Date();
@@ -699,7 +649,6 @@ public class ApplicationState extends Application
         newItem = new MessageListItem(caption,filename); // create a new history item
         newItem.content(content);
         newItem.type(type);
-        newItem.fromAddress(fromAddress);
         newItem.contentSettings(contentSettings);
 
         byte[] resultBytes = MessageItemToBytes(newItem);
@@ -877,31 +826,6 @@ public class ApplicationState extends Application
 
     }
 
-    public synchronized String getLoggedInName()
-    {
-        try {
-            String settings_filename = getApplicationContext().getFilesDir().getPath().toString() + "/" + getPictoSettingsFilename();
-            File file = new File(settings_filename);
-
-            if (file.exists() == true) {
-                // read the contents of the file
-                byte[] content = getByteArrayFromFile(settings_filename);
-
-                PictoSettings newItem = PictoSettings.bytesToPictoSettings(content);
-
-                if(newItem.username() != null)
-                {
-                    return(newItem.username());
-                }
-
-            }
-        }
-        catch(Exception e)
-        {
-
-        }
-        return("");
-    }
 
     //  exits activity.
     public synchronized void exitApplication()
@@ -914,155 +838,6 @@ public class ApplicationState extends Application
         startActivity(intent);
 
 
-    }
-
-    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-    public static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-    public static byte[] makeEncryptKey(String username,String caption)
-    {
-        //AES_key_128
-        byte[] usernameBytes = username.getBytes();
-        byte[] captionBytes = caption.getBytes();
-
-        int outputIndex = 0;
-        int usernameIndex = 0;
-        int captionIndex = 0;
-        int keyIndex = 0;
-        int field_selection = 0;
-
-        while(outputIndex < 16)
-        {
-            switch(field_selection)
-            {
-                case 0:
-                    if (usernameIndex < usernameBytes.length) {
-                        unique_key_128[outputIndex++] = usernameBytes[usernameIndex++];
-
-                    }
-                    field_selection++;
-                    continue;
-
-                case 1:
-                    if (captionIndex < captionBytes.length) {
-                        unique_key_128[outputIndex++] = captionBytes[captionIndex++];
-
-                    }
-                    field_selection++;
-                    continue;
-
-                case 2:
-                    if (keyIndex < AES_key_128.length) {
-                        unique_key_128[outputIndex++] = AES_key_128[keyIndex++];
-
-                    }
-                    field_selection = 0;  // start from first field
-                    continue;
-
-            }
-
-
-        }
-        return(unique_key_128);
-    }
-
-    public static byte[] encryptBitmap(final Bitmap bmp, byte[] key) throws Exception
-    {
-        //byte[] input;
-        // compress the bitmap image to a PNG byte array
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        //return(byteArray);
-
-        return(encrypt(byteArray, key));  // return the AES encrypted buffer
-    }
-
-    public static Bitmap decryptBitmap(final byte[] input, byte[] key) throws Exception
-    {
-        byte[] aes_decrypt_buf = null;
-
-        try {
-            // AES decrypt
-            aes_decrypt_buf = decrypt(input, key);
-        }
-        catch(Exception e)
-        {
-            throw e;
-        }
-
-        /*
-        // decrypt AES
-        try {
-            SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, keySpec);
-            aes_decrypt_buf = cipher.doFinal(input);
-        }
-        catch(Exception e)
-        {
-            throw e;
-        }
-        */
-
-        //DECODE  PNG
-        Bitmap compressed_bitmap = BitmapFactory.decodeByteArray(aes_decrypt_buf,0,aes_decrypt_buf.length);
-
-        ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 , blob);
-        byte[] bitmapdata = blob.toByteArray();
-
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-
-        return(bitmap);
-    }
-
-    public static byte[] encryptBitmapWorks(final Bitmap bmp, byte[] key) throws Exception
-    {
-        byte[] input;
-        // compress the bitmap image to a PNG byte array
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        return(byteArray);
-
-        //return(encrypt(input, key));
-    }
-
-    public static Bitmap decryptBitmapWorks(final byte[] input, byte[] key) throws Exception
-    {
-        /*
-        byte[] aes_decrypt_buf = null;
-        // decrypt AES
-        try {
-            SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, keySpec);
-            aes_decrypt_buf = cipher.doFinal(input);
-        }
-        catch(Exception e)
-        {
-            throw e;
-        }
-        */
-        //DECODE
-        Bitmap compressed_bitmap = BitmapFactory.decodeByteArray(input,0,input.length);
-
-        ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 , blob);
-        byte[] bitmapdata = blob.toByteArray();
-
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-
-        return(bitmap);
     }
 
     public static byte[] encrypt(byte[] input, byte[] key) throws Exception

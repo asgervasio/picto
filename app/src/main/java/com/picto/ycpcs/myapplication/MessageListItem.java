@@ -9,7 +9,6 @@ public class MessageListItem implements Serializable{
     private String type = "";
     private String contentSettings = "";
     private byte[] content;
-    private String fromAddress = "";
 
     public MessageListItem(String name,String filename)
     {
@@ -17,18 +16,6 @@ public class MessageListItem implements Serializable{
         filename(filename);
         type("");
 
-    }
-
-    // get the fromAddress
-    public  String fromAddress()
-    {
-        return this.fromAddress;
-    }
-
-    // get the fromAddress
-    public  void fromAddress(String fromAddress)
-    {
-        this.fromAddress = fromAddress;
     }
 
     // get the info we want to display for our view
