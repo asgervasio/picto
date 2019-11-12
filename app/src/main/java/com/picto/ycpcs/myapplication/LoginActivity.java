@@ -1,221 +1,198 @@
 package com.picto.ycpcs.myapplication;
 
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputFilter;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LoginActivity extends AppCompatActivity {
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
+    EditText emailText, passwordText;
+    String email, password;
+    private FirebaseAuth mAuth;
+    private static final String TAG = "CustomAuthActivity";
     ApplicationState applicationState = null;
-    EditText editText_password;
-    EditText  editText_username;
-    TextView textview_status;
-    CheckBox checkBox_CreateAccount;
-    String username = "";
-    String password = "";
-    boolean createAccountChecked;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // get global data reference
-        applicationState = ((ApplicationState)getApplicationContext());
+        // Views
+        emailText = findViewById(R.id.email);
+        passwordText = findViewById(R.id.password);
 
-        editText_password = (EditText)findViewById(R.id.editText_password);
-        //editText_password.setFilters(new InputFilter[] { filter });
+        // Buttons
+        findViewById(R.id.login).setOnClickListener(this);
+        findViewById(R.id.createAccount).setOnClickListener(this);
 
-        editText_username = (EditText)findViewById(R.id.editText_username);
+        email = emailText.toString();
+        password = passwordText.toString();
+        mAuth = FirebaseAuth.getInstance();
+    }
 
-        textview_status = (TextView)findViewById(R.id.textViewStatus);
-        editText_username.setText(applicationState.username());
-        //editText_username.setEnabled(false);
-        editText_username.setKeyListener(null); // set key listener to null to make it readonly
-        editText_password.setText(applicationState.password());
-
-        if(applicationState.username().length() > 0) {
-            setTitle("Picto (" + applicationState.username() + ")");
+    @Override
+    public void onClick(View view){
+        int i = view.getId();
+        if (i == R.id.createAccount) {
+            createAccount(emailText.getText().toString(), passwordText.getText().toString());
+        } else if (i == R.id.login) {
+            signIn(emailText.getText().toString(), passwordText.getText().toString());
         }
+    }
 
-        if(applicationState.debugEnabled() == true)
-        {
-            textview_status.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            textview_status.setVisibility(View.GONE);
-        }
-        //applicationState.lastStatusMessage = "test Messsage";
-        if(applicationState.lastStatusMessage.length() > 0)
-        {
-            textview_status.setText(applicationState.lastStatusMessage);
-            //applicationState.addStatusMessage(" ,clear ");
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+    }
 
-        }
+    private void createAccount(String email, String password){
+        //TODO Validate credentials are correct
+        Log.d(TAG, "createAccount:" + email);
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
 
-        // checkBox_CreateAccount
-        checkBox_CreateAccount = (CheckBox)findViewById(R.id.checkBox_CreateAccount);
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCustomToken:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "User created!",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCustomToken:failure", task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
 
-        Button button= (Button) findViewById(R.id.button_login);
+                        // ...
+                    }
+                });
+    }
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(LoginActivity.this, "login clicked", Toast.LENGTH_SHORT).show();
+    private void signIn(String email, String password) {
+        //TODO Validate credentials are correct
+        Log.d(TAG, "signIn:" + email);
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCustomToken:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "User Authenticated",
+                                    Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(LoginActivity.this, CameraActivity.class);
+                            startActivity(intent);
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCustomToken:failure", task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
 
-                // get username and IP address
-                password = editText_password.getText().toString();
-                username = (editText_username.getText().toString());
-                if(username.length() == 0)
-                {
-                    showLoginDialogButtonClicked(view,"You must specify a username in settings before login");
-                    return;
-                }
-                /*
-                if(password.length() == 0)
-                {
-                    showLoginDialogButtonClicked(view,"You must specify a password before login");
-                    return;
-                }
-                */
+                        // ...
+                    }
+                });
+    }
 
-                createAccountChecked = checkBox_CreateAccount.isChecked();
-
-                LoginToServerOperation asyncTask=new LoginToServerOperation();
-                asyncTask.execute("");
-
-
-            }
-        });
-
+    private void updateUI(FirebaseUser user) {
+        //TODO change UI when called
 
     }
 
     @Override
-    public void  onBackPressed()
-    {
-        super.onBackPressed();
-
-        startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
-    private class LoginToServerOperation extends AsyncTask<String, Void, String> {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
-        @Override
-        protected String doInBackground(String... params) {
-
-
-            PictoClient client = null;
-            //int msgCount = 1;
-
-            // new thread for a client
-            client = new PictoClient();
-
-            if(client.connect(applicationState.ipAddress()) == false)
-            {
-                toastOnGUI("Picto Client connect failed ");
-            }
-            else
-            {
-                toastOnGUI("Picto Client connect SUCCESS");
-                int status = client.login(username, password, createAccountChecked);
-
-                if(status== CommandHeader.STATUS_SUCCESS)
-                {
-
-                    toastOnGUI("Picto Client login SUCCESS");
-                    if(applicationState.getPictoClient() != null)
-                    {
-                        // if there is a previous client connection to server, disconnect
-                        applicationState.getPictoClient().disconnect(false);
-                    }
-                    applicationState.setPictoClient(client);
-                    applicationState.username(username);
-                    applicationState.password(password);
-                    applicationState.loggedIn(true);
-                    startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
-
-
-                }
-                else
-                {
-                    toastOnGUI("Picto Client login failed " + getLoginStatusString(status));
-                }
-            }
-
-
-            return "Executed";
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
         }
-        @Override
-        protected void onPostExecute(String result) {
-
-
-
-        }
-
-        @Override
-        protected void onPreExecute() {}
-
-        @Override
-        protected void onProgressUpdate(Void... values) {}
+        return super.onOptionsItemSelected(item);
     }
 
-    public static String getLoginStatusString(int status)
-    {
-        String rv = "";
-
-        switch(status)
-        {
-            case CommandHeader.STATUS_SUCCESS:
-                rv = "SUCCESS";
-                break;
-            case CommandHeader.STATUS_ERROR_USER_NOT_FOUND:
-                rv = "USER NOT FOUND";
-                break;
-            case CommandHeader.STATUS_ERROR_LOGIN_USERNAME_USED:
-                rv = "USERNAME USED";
-                break;
-            case CommandHeader.STATUS_ERROR_UNAUTHORIZED:
-                rv = "UNAUTHORIZED";
-                break;
-            default:
-                rv = "UNKNOWN = " + Integer.toString(status);
-
-                break;
-        }
-        return rv;
-
-    }
-    public void toastOnGUI(final String message) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                // use data here
-                Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+/*
+    public void logInOld(View view) {
+        if(isValidInput(emailText.getText().toString(), passwordText.getText().toString())){
+            if(emailText.getText().toString().equals("admin") && passwordText.getText().toString().equals("admin")){
+                //correct password
+                Toast toast = Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_LONG);
+                toast.show();
+                Intent intent = new Intent(this, CameraActivity.class);
+                startActivity(intent);
             }
-        });
+            else{
+                //wrong password
+                Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+        else{
+            //not valid input
+            Toast toast = Toast.makeText(LoginActivity.this, "Invalid input", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+*/
+
+    public static boolean isValidInput(String user, String pword){
+
+        if(user.isEmpty() || pword.isEmpty()){
+            return false;
+        }
+        return true;
     }
 
-    public void showLoginDialogButtonClicked(View view,String message) {
-
-        // setup the alert builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Send");
-        builder.setMessage(message);
-
-        // add a button
-        builder.setPositiveButton("OK", null);
-
-        // create and show the alert dialog
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    public static boolean validAccountCredentials(String username, String email){
+        if(accountExists(username, email)){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
+
+    public static boolean accountExists(String username, String email){
+        //TODO update when user account objects are checkable
+        return false;
+    }
+
+    public static boolean isAdminLogin(String user, String pword){
+        if(user == "admin" && pword == "admin"){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 }
