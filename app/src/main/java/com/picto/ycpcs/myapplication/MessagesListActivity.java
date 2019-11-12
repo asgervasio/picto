@@ -94,7 +94,7 @@ public class MessagesListActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication"));
+        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
     }
 
     @Override
@@ -132,7 +132,7 @@ public class MessagesListActivity extends AppCompatActivity {
                 else {
                     SetMessageToView();
                     intent = new Intent();
-                    intent.setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication");
+                    intent.setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.MessageViewActivity");
                     startActivity(intent);
                 }
                 return true;
