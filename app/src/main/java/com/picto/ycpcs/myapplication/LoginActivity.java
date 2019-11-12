@@ -140,30 +140,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         return super.onOptionsItemSelected(item);
     }
 
-/*
-    public void logInOld(View view) {
-        if(isValidInput(emailText.getText().toString(), passwordText.getText().toString())){
-            if(emailText.getText().toString().equals("admin") && passwordText.getText().toString().equals("admin")){
-                //correct password
-                Toast toast = Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_LONG);
-                toast.show();
-                Intent intent = new Intent(this, CameraActivity.class);
-                startActivity(intent);
-            }
-            else{
-                //wrong password
-                Toast toast = Toast.makeText(LoginActivity.this, "Incorrect credentials", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        }
-        else{
-            //not valid input
-            Toast toast = Toast.makeText(LoginActivity.this, "Invalid input", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
-*/
-
     public static boolean isValidInput(String user, String pword){
 
         if(user.isEmpty() || pword.isEmpty()){
