@@ -21,10 +21,12 @@ import java.util.List;
 
 public class ContactsActivity extends AppCompatActivity { // issue here some where
     EditText nameText, emailText;
-    ArrayList<Contact> contacts = new ArrayList<Contact>();
+    ArrayList<Contact> contacts;// = new ArrayList<Contact>();
     ListView contactListView;
     static final private int MENU_ADD = Menu.FIRST;
     static final private int MENU_DELETE = Menu.FIRST+1;
+    ArrayAdapter<Contact> adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,8 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
         contactListView = (ListView)  findViewById(R.id.listView); //editListView in layout xml
         final Button addBtn = (Button)  findViewById(R.id.button);
         final Button deleteBtn = (Button) findViewById(R.id.button2);
+        contacts = new ArrayList<Contact>();
+        contacts.add(new Contact("agrove9", "agrove9@ycp.edu"));
        /* TabHost tabHost = (TabHost) findViewById(R.id.TabHost);
 
         tabHost.setup();
@@ -92,7 +96,7 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
     }
 
     private void populateList() {
-        ArrayAdapter<Contact> adapter = new ContactListAdaptor();
+        adapter = new ContactListAdaptor();
         contactListView.setAdapter(adapter); // issue here
     }
     private class ContactListAdaptor extends ArrayAdapter<Contact> {
@@ -117,6 +121,7 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
     }
 
     private void addContact(String name, String email) {
+        contacts = new ArrayList<Contact>();
         contacts.add(new Contact(name, email));
     }
 

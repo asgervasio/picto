@@ -102,6 +102,11 @@ public class CameraActivity extends AppCompatActivity {
             asyncTask.execute("");
             return true;
         }
+        else if (id == R.id.action_contacts)
+        {
+            startActivity(new Intent(this, ContactsActivity.class));
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
