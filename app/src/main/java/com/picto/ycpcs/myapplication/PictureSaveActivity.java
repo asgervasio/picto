@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
+import static com.picto.ycpcs.myapplication.R.id.imageView;
 
 public class PictureSaveActivity extends AppCompatActivity {
 
@@ -47,12 +48,17 @@ public class PictureSaveActivity extends AppCompatActivity {
         Button savebutton= (Button) findViewById(R.id.buttonSave);
         savebutton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 //Toast.makeText(MessageSendSaveActivity.this, "save clicked", Toast.LENGTH_SHORT).show();
 
                 // save the message to file and message list
                 Bitmap bmp = applicationState.getLastPicture();
                 String caption = captionEditView.getText().toString();
+                if(caption.length() == 0)
+                {
+                    showPictureSavedDialogButtonClicked(view,"You must specify a caption before saving");
+                    return;
+                }
                 saveBitmapToFile(bmp,caption);
                 startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
             }
@@ -79,42 +85,29 @@ public class PictureSaveActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             public void run() {
 
-                // compress the bimap image to a PNG byte array
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-                //Toast.makeText(MessageSendSaveActivity.this, "PNG COMPRESSED Size " + byteArray.length, Toast.LENGTH_LONG).show();
- /*
-                // encrypt
-                byte[] input = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56 };
-                // 128 bit key
-                byte[] key = new byte[] { 34, 35, 36, 37, 37, 37, 67, 68, 34, 35, 36, 37, 37, 37, 67, 68 };
+                //byte[] key = applicationState.AES_key_128;
+                byte[] key = applicationState.makeEncryptKey(applicationState.username(),caption);
+                String byteString = applicationState.bytesToHex(key);
+                applicationState.addStatusMessage(",saveBitmapToFile username =" + applicationState.username() + ", caption =" + caption + ", key = " + byteString);
+
+                byte[] byteArray;
                 try
                 {
+                    byteArray = applicationState.encryptBitmap(bmp, key);
+                    // store the last compressed picture in global memeory
+                    //applicationState.setLastPictureCompressed(byteArray);
 
-                    toastOnGUI("original png buffer size = " + Integer.toString(byteArray.length));
-                    //toastOnGUI(java.util.Arrays.toString(input));
+                    // store the last compressed picture in global memeory
+                    applicationState.setLastPictureCompressed(byteArray);
 
-                    byte[] encryptedbuf = applicationState.encrypt(byteArray, key);
-                    toastOnGUI("encrypted png buffer size = " + Integer.toString(encryptedbuf.length));
-                    //toastOnGUI(java.util.Arrays.toString(encryptedbuf));
-
-                    byte[] decryptedbuf = applicationState.decrypt(encryptedbuf, key);
-                    toastOnGUI("decrypted png buffer size = " + Integer.toString(decryptedbuf.length));
-                    //toastOnGUI(java.util.Arrays.toString(decryptedbuf));
+                    // add the picture buffer to the message list
+                    applicationState.addPicture(byteArray,caption);
                 }
                 catch(Exception e)
                 {
 
                 }
-                // encrypt
-*/
-                // store the last compressed picture in global memeory
-                applicationState.setLastPictureCompressed(byteArray);
 
-                // add the picture buffer to the message list
-                //applicationState.addMessage(byteArray,caption);
-                applicationState.addPicture(byteArray,caption);
 
             }
         });
@@ -133,7 +126,7 @@ public class PictureSaveActivity extends AppCompatActivity {
         });
     }
 
-    public void showSettingsSavedDialogButtonClicked(View view,String message) {
+    public void showPictureSavedDialogButtonClicked(View view,String message) {
 
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

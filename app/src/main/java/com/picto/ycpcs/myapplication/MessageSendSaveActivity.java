@@ -17,6 +17,7 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
+import static com.picto.ycpcs.myapplication.R.id.imageView;
 
 public class MessageSendSaveActivity extends AppCompatActivity {
 
@@ -36,7 +37,8 @@ public class MessageSendSaveActivity extends AppCompatActivity {
         final EditText toAddressEditView = (EditText)findViewById(R.id.editText_toAddress);
         final Spinner spinnerTimeout  = (Spinner)findViewById(R.id.spinnerTimeout);
         spinnerTimeout.setSelection(1);
-
+        //captionEditView.setEnabled(false);
+        captionEditView.setKeyListener(null); // set key listener to null to make it readonly
         imageView = (ImageView)findViewById(R.id.imageViewSendSave);
 
         Bitmap bitmap = applicationState.getLastPicture();
@@ -48,11 +50,16 @@ public class MessageSendSaveActivity extends AppCompatActivity {
 
         imageView.setImageBitmap(bitmap);
 
+        if(applicationState.username().length() > 0) {
+            setTitle("Picto (" + applicationState.username() + ")");
+        }
+
+
 
         Button sendbutton= (Button) findViewById(R.id.buttonSend);
         sendbutton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 //Toast.makeText(MessageSendSaveActivity.this, "send clicked", Toast.LENGTH_SHORT).show();
 
                 // send the message to the destination
@@ -65,8 +72,18 @@ public class MessageSendSaveActivity extends AppCompatActivity {
                 {
                     Bitmap bmp = applicationState.getLastPicture();
                     String caption = captionEditView.getText().toString();
-                    String toAddress = toAddressEditView.getText().toString();
+                    String toAddress = toAddressEditView.getText().toString().toLowerCase();
                     String contentSettings = String.valueOf(spinnerTimeout.getSelectedItem());
+                    if(caption.length() == 0)
+                    {
+                        showSettingsSavedDialogButtonClicked(view,"You must specify a caption before sending");
+                        return;
+                    }
+                    if(toAddress.length() == 0)
+                    {
+                        showSettingsSavedDialogButtonClicked(view,"You must specify an address before sending");
+                        return;
+                    }
                     saveBitmapToFile(bmp, caption,contentSettings);
                     applicationState.toAddress(toAddress);
                     applicationState.caption(caption);
@@ -79,39 +96,12 @@ public class MessageSendSaveActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    showSettingsSavedDialogButtonClicked(v,"You must Login before sending");
+                    showSettingsSavedDialogButtonClicked(view,"You must Login before sending");
                     //Toast.makeText(MessageSendSaveActivity.this, "Login before sending", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
-/*
-        Button savebutton= (Button) findViewById(R.id.buttonSave);
-        savebutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(MessageSendSaveActivity.this, "save clicked", Toast.LENGTH_SHORT).show();
-
-                // save the message to file and message list
-                Bitmap bmp = applicationState.getLastPicture();
-                String caption = captionEditView.getText().toString();
-                saveBitmapToFile(bmp,caption);
-                startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
-            }
-        });
-
-        Button trashbutton= (Button) findViewById(R.id.buttonTrash);
-        trashbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(MessageSendSaveActivity.this, "trash clicked", Toast.LENGTH_SHORT).show();
-
-                // son't save the message
-                startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
-            }
-        });
-
-*/
     }
 
     public void saveBitmapToFile(final Bitmap bmp,final String caption, final String contentSettings)
@@ -120,18 +110,21 @@ public class MessageSendSaveActivity extends AppCompatActivity {
         // we don't want to stall the GUI thread.
         runOnUiThread(new Runnable() {
             public void run() {
+                //byte[] key = applicationState.AES_key_128;
+                byte[] key = applicationState.makeEncryptKey(applicationState.username(),caption);
+                String byteString = applicationState.bytesToHex(key);
+                applicationState.addStatusMessage(",saveBitmapToFile username =" + applicationState.username() + ", caption =" + caption + ", key = " + byteString);
 
-                // compress the bimap image to a PNG byte array
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-                //Toast.makeText(MessageSendSaveActivity.this, "PNG COMPRESSED Size " + byteArray.length, Toast.LENGTH_LONG).show();
+                try
+                {
+                    byte[] byteArray = applicationState.encryptBitmap(bmp, key);
+                    // store the last compressed picture in global memeory
+                    applicationState.setLastPictureCompressed(byteArray);
+                }
+                catch(Exception e)
+                {
 
-                // store the last compressed picture in global memeory
-                applicationState.setLastPictureCompressed(byteArray);
-
-                // add the picture buffer to the message list
-                //applicationState.addMessage(byteArray,caption,applicationState.picto_msg_type_Sent,contentSettings);
+                }
 
             }
         });
@@ -139,28 +132,7 @@ public class MessageSendSaveActivity extends AppCompatActivity {
 
 
     }
-/*
-    public void addMessage(byte[] content, String caption)
-    {
-        MessageListItem newItem = null;
-        Date date = new Date();
-        String filename = getApplicationContext().getFilesDir().getPath().toString() + "/" + applicationState.getPictoMsgFilePrefix() + Long.toString(date.getTime());
 
-        newItem = new MessageListItem(caption,filename); // create a new history item
-        newItem.content(content);
-
-        byte[] resultBytes = applicationState.historyItemToBytes(newItem);
-
-        //byte[] resultBytes = historyItemToBytes(newItem); // serialise
-        //HistoryItem resultItem = bytesToHistoryItem(resultBytes);  //deserilize
-
-        applicationState.addHistoryItem(newItem); // add this new scan to the history list
-        applicationState.createHistoryFile(filename,resultBytes);
-        //applicationState.createHistoryFile(newItem.filename(), newItem.name()); // save this history information file
-
-
-    }
-*/
     private class SendMessageOperation extends AsyncTask<String, Void, String> {
 
         @Override
@@ -209,65 +181,7 @@ public class MessageSendSaveActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Void... values) {}
     }
-/*
-    private class SendMessageOperation extends AsyncTask<String, Void, String> {
 
-        @Override
-        protected String doInBackground(String... params) {
-
-
-            PictoClient client = null;
-            int msgCount = 1;
-
-            // new thread for a client
-            client = new PictoClient();
-
-            client.connect(applicationState.ipAddress());
-
-            client.login(applicationState.username(), "password",false);
-
-            toastOnGUI("New Picto Client Main. connect ");
-            applicationState.setPictoClient(client);
-
-            String caption = applicationState.caption();
-            String toAddress = applicationState.toAddress();
-
-            PictoMessage message = new PictoMessage(applicationState.username(), toAddress,caption,"message" + String.valueOf(msgCount) + ".txt");
-
-            byte[] content = applicationState.getLastPictureCompressed();
-
-            message.content(content);
-            msgCount++;
-
-            if(client.sendMessageToServer(message) == true)
-            {
-                //System.out.println("Picto Client Main. sendMessageToServer() true ");
-                //Toast.makeText(MessageSendSaveActivity.this, "Picto Client Main. sendMessageToServer() true ", Toast.LENGTH_SHORT).show();
-            }
-            else
-            {
-                //System.out.println("Picto Client Main. sendMessageToServer() false ");
-                //Toast.makeText(MessageSendSaveActivity.this, "Picto Client Main. sendMessageToServer() false ", Toast.LENGTH_SHORT).show();
-            }
-
-
-            return "Executed";
-        }
-        @Override
-        protected void onPostExecute(String result) {
-
-
-
-        }
-
-        @Override
-        protected void onPreExecute() {}
-
-        @Override
-        protected void onProgressUpdate(Void... values) {}
-    }
-
-*/
     public void toastOnGUI(final String message) {
         runOnUiThread(new Runnable() {
             public void run() {

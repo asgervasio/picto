@@ -49,6 +49,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // get global data reference
+        applicationState = ((ApplicationState)getApplicationContext());
+        //applicationState.setParentActivity(this);
+
+        loadSettings(); // load user settings
+
+        if(applicationState.username().length() > 0) {
+            setTitle("Picto (" + applicationState.username() + ")");
+        }
+
     }
 
     @Override
@@ -56,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.MainActivity"));
     }
 
     @Override
@@ -85,9 +95,22 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, MessagesListActivity.class));
             return true;
         }
+        else if (id == R.id.action_pictures)
+        {
+            //Toast.makeText(MainActivity.this, "messages clicked", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, PictureListActivity.class));
+            return true;
+        }
+        // action_pictures
         else if (id == R.id.action_take_picture) {
             //Toast.makeText(MainActivity.this, "Search clicked", Toast.LENGTH_LONG).show();
             takePicture();
+            return true;
+        }
+        else if (id == R.id.action_login)
+        {
+            //Toast.makeText(MainActivity.this, "messages clicked", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, LoginActivity.class));
             return true;
         }
         /*
@@ -102,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+public void startLoginActivity()
+{
+    startActivity(new Intent(this, LoginActivity.class));
+}
 
     public void takePicture()
     {
@@ -125,7 +152,8 @@ public class MainActivity extends AppCompatActivity {
                     imageView.setImageBitmap(bitmap);
 
 
-                    startActivity(new Intent(this, MessageSendSaveActivity.class));
+                    //startActivity(new Intent(this, MessageSendSaveActivity.class));
+                    startActivity(new Intent(this, PictureSaveActivity.class));
                     break;
 
             }
@@ -141,86 +169,6 @@ public class MainActivity extends AppCompatActivity {
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-/*
-    public void saveBitmapToFile(final Bitmap bmp)
-    {
-        // this needs to be run in its own thread because the compression can take some time and
-        // we don't want to stall the GUI thread.
-        runOnUiThread(new Runnable() {
-            public void run() {
-
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-                Toast.makeText(MainActivity.this, "PNG COMPRESSED Size " + byteArray.length, Toast.LENGTH_LONG).show();
-
-                addMessage(byteArray);
-
-                //DECODE
-                Bitmap compressed_bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.length);
-
-                ByteArrayOutputStream blob = new ByteArrayOutputStream();
-                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 , blob);
-                byte[] bitmapdata = blob.toByteArray();
-
-                Bitmap newbitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-                int size = newbitmap.getByteCount();
-                Toast.makeText(MainActivity.this, "recovered picture size is: " + size + " bytes", Toast.LENGTH_LONG).show();
-            }
-        });
-
-
-
-    }
-
-    public void addMessage(byte[] content)
-    {
-        MessageListItem newItem = null;
-        Date date = new Date();
-        String filename = getApplicationContext().getFilesDir().getPath().toString() + "/" + applicationState.getPictoMsgFilePrefix() + Long.toString(date.getTime());
-
-        newItem = new MessageListItem("test contents " + Long.toString(date.getTime()),filename); // create a new history item
-        newItem.content(content);
-
-        byte[] resultBytes = applicationState.historyItemToBytes(newItem);
-
-        applicationState.addHistoryItem(newItem); // add this new scan to the history list
-        applicationState.createHistoryFile(filename,resultBytes);
-
-
-    }
-
-    void testCompression()
-    {
-        try {
-            // Encode a String into bytes
-            String inputString = "blahblahblah000000000000000000000000000000";
-            byte[] input = inputString.getBytes("UTF-8");
-
-            // Compress the bytes
-            byte[] output = new byte[100];
-            Deflater compresser = new Deflater();
-            compresser.setInput(input);
-            compresser.finish();
-            int compressedDataLength = compresser.deflate(output);
-            compresser.end();
-
-            // Decompress the bytes
-            Inflater decompresser = new Inflater();
-            decompresser.setInput(output, 0, compressedDataLength);
-            byte[] result = new byte[100];
-            int resultLength = decompresser.inflate(result);
-            decompresser.end();
-
-            // Decode the bytes into a String
-            String outputString = new String(result, 0, resultLength, "UTF-8");
-        } catch(java.io.UnsupportedEncodingException ex) {
-            // handle
-        } catch (java.util.zip.DataFormatException ex) {
-            // handle
-        }
-    }
-*/
     void loadSettings()
     {
         try {
