@@ -1,6 +1,5 @@
 package com.picto.ycpcs.myapplication;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +20,6 @@ public class SettingsActivity extends AppCompatActivity {
     EditText  editText_IP_Address;
     EditText  editText_username;
     CheckBox checkBox_displayDebug;
-    SettingsActivity settingsActivity = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +28,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         // get global data reference
         applicationState = ((ApplicationState)getApplicationContext());
-        settingsActivity =  this;
 
         // input filter for IP address
         InputFilter filter = new InputFilter() {
@@ -71,19 +68,9 @@ public class SettingsActivity extends AppCompatActivity {
         Button button= (Button) findViewById(R.id.button_save);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 //Toast.makeText(SettingsActivity.this, "save clicked", Toast.LENGTH_SHORT).show();
 
-                if(editText_username.getText().toString().length() == 0)
-                {
-                    showSettingsSavedDialogButtonClicked(view,"You must specify a username");
-                    return;
-                }
-                if(editText_IP_Address.getText().toString().length() == 0)
-                {
-                    showSettingsSavedDialogButtonClicked(view,"You must specify a server IP address");
-                    return;
-                }
                // get username and IP address
                 applicationState.ipAddress(editText_IP_Address.getText().toString());
                 applicationState.username(editText_username.getText().toString());
@@ -98,32 +85,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 applicationState.createFile(filename,settingsBytes);
 
-                showSettingsSavedDialogButtonClicked(view,"Settings Saved");
-            }
-        });
-
-        Button buttonCleanFiles= (Button) findViewById(R.id.button_clean_files);
-        buttonCleanFiles.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-
-                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(settingsActivity);
-                builder.setMessage("Are you sure you want to delete all messages and picture file(s)?\n")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                applicationState.CleanupFiles();
-                                showSettingsSavedDialogButtonClicked(view,"Messages and pictures deleted");
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-                android.app.AlertDialog alert = builder.create();
-                alert.show();
-
+                showSettingsSavedDialogButtonClicked(v);
             }
         });
 
@@ -156,12 +118,12 @@ public class SettingsActivity extends AppCompatActivity {
         startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
     }
 
-    public void showSettingsSavedDialogButtonClicked(View view,String message) {
+    public void showSettingsSavedDialogButtonClicked(View view) {
 
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Settings");
-        builder.setMessage(message);
+        builder.setMessage("Settings Saved");
 
         // add a button
         builder.setPositiveButton("OK", null);
