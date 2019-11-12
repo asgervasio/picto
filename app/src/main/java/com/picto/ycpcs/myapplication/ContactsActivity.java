@@ -31,10 +31,11 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
-        nameText = (EditText) findViewById(R.id.ContactName);
+        nameText = (EditText) findViewById(R.id.Username);
         emailText = (EditText) findViewById(R.id.Email);
         contactListView = (ListView)  findViewById(R.id.listView); //editListView in layout xml
         final Button addBtn = (Button)  findViewById(R.id.button);
+        final Button deleteBtn = (Button) findViewById(R.id.button2);
        /* TabHost tabHost = (TabHost) findViewById(R.id.TabHost);
 
         tabHost.setup();
@@ -61,6 +62,14 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
                 Toast.makeText(getApplicationContext(), nameText.getText().toString() + "has been added to your contacts!", Toast.LENGTH_SHORT).show();
             }
         });
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteContact(nameText.getText().toString(), emailText.getText().toString());
+                //populateList(); // issue here
+                Toast.makeText(getApplicationContext(), nameText.getText().toString() + "has been deleted from your contacts!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
         nameText.addTextChangedListener(new TextWatcher() {
@@ -72,6 +81,7 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 addBtn.setEnabled(!nameText.getText().toString().trim().isEmpty());
+                deleteBtn.setEnabled(!nameText.getText().toString().trim().isEmpty());
             }
 
             @Override
@@ -97,7 +107,7 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
 
             Contact currentContact = contacts.get(position);
 
-            TextView name = (TextView) view.findViewById(R.id.ContactName);
+            TextView name = (TextView) view.findViewById(R.id.username);
             name.setText(currentContact.getName());
             TextView email = (TextView) view.findViewById(R.id.Email);
             email.setText(currentContact.getEmail());
@@ -140,7 +150,7 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
 
 
 
-    public void deleteContact() {
-
+    public void deleteContact(String name, String email) {
+        contacts.remove(new Contact(name, email)); // needs redone
     }
 }

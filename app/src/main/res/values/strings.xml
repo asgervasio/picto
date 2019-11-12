@@ -28,8 +28,7 @@
 
     <string name="Add">Add</string>
 
-    <string name="username">Username</string>
-
-    <string name="email">Email</string>
     <string name="add_contact">Add Contact</string>
+    <string name="email">Email</string>
+    <string name="username">Username</string>
 </resources>

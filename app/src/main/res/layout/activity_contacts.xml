@@ -81,11 +81,11 @@
     </android.support.design.widget.TabLayout> -->
 
     <android.support.design.widget.TextInputEditText
-        android:id="@+id/ContactName"
+        android:id="@+id/Username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="35dp"
-        android:hint="Contact Name"
+        android:hint="@string/username"
         app:layout_constraintBottom_toTopOf="@+id/Email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -96,11 +96,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="483dp"
-        android:hint="Email"
+        android:hint="@string/email"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ContactName" />
+        app:layout_constraintTop_toBottomOf="@id/Username" />
 
     <!--<ListView
         android:id="@+id/listViewHistory"
