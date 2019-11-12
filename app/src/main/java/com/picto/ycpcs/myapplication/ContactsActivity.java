@@ -21,8 +21,10 @@ import java.util.List;
 
 public class ContactsActivity extends AppCompatActivity { // issue here some where
     EditText nameText, emailText;
-    List<Contact> contacts = new ArrayList<Contact>();
+    ArrayList<Contact> contacts = new ArrayList<Contact>();
     ListView contactListView;
+    static final private int MENU_ADD = Menu.FIRST;
+    static final private int MENU_DELETE = Menu.FIRST+1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +57,7 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
             @Override
             public void onClick(View view) {
                 addContact(nameText.getText().toString(), emailText.getText().toString());
-                populateList(); // issue here
+                //populateList(); // issue here
                 Toast.makeText(getApplicationContext(), nameText.getText().toString() + "has been added to your contacts!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -111,7 +113,12 @@ public class ContactsActivity extends AppCompatActivity { // issue here some whe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu);
+
+        menu.add(0, MENU_ADD, Menu.NONE, "Add");
+        menu.add(0, MENU_DELETE, Menu.NONE, "Delete");
+
         return true;
     }
 

@@ -21,8 +21,17 @@
         </activity>
         <activity android:name=".MessageCreateActivity" />
         <activity android:name=".LoginActivity" >
+            <intent-filter>
+
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+
+            </intent-filter>
+
 
         </activity>
+
         <activity android:name=".SettingsActivity" />
         <activity android:name=".MessagesListActivity" />
         <activity android:name=".MessageViewActivity" />
@@ -30,16 +39,9 @@
 
 
         <activity android:name=".ContactsActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+
             android:label="@string/title_activity_contacts">
 
-        <intent-filter>
-
-        <action android:name="android.intent.action.MAIN"/>
-
-        <category android:name="android.intent.category.LAUNCHER"/>
-
-    </intent-filter>
 
     </activity>
     </application>

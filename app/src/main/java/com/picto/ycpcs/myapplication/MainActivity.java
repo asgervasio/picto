@@ -90,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
             takePicture();
             return true;
         }
+        else if (id == R.id.action_contacts)
+        {
+            startActivity(new Intent(this, ContactsActivity.class));
+            return true;
+        }
         /*
         else if (id == R.id.action_connect) {
             Toast.makeText(MainActivity.this, "Connect not supported", Toast.LENGTH_LONG).show();
