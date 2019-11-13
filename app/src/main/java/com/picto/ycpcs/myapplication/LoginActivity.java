@@ -18,33 +18,30 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-<<<<<<< HEAD
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText emailText, passwordText;
-    String email, password;
+    EditText emailText, passwordText, userText;
+    String email, password, username;
     private FirebaseAuth mAuth;
     private static final String TAG = "CustomAuthActivity";
-=======
-    EditText username, password;
     ApplicationState applicationState = null;
 
->>>>>>> master
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-<<<<<<< HEAD
 
         // Views
         emailText = findViewById(R.id.email);
         passwordText = findViewById(R.id.password);
+        userText = findViewById(R.id.username);
 
         // Buttons
         findViewById(R.id.login).setOnClickListener(this);
         findViewById(R.id.createAccount).setOnClickListener(this);
 
+        username = userText.toString();
         email = emailText.toString();
         password = passwordText.toString();
         mAuth = FirebaseAuth.getInstance();
@@ -122,17 +119,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void updateUI(FirebaseUser user) {
         //TODO change UI when called
-=======
-        applicationState = ((ApplicationState)getApplicationContext());
 
-        username = (EditText)findViewById(R.id.username);
-        password = (EditText)findViewById(R.id.password);
-
-        username.setText(applicationState.username());
-        password.setText(applicationState.password());
-
-
->>>>>>> master
     }
 
     @Override
