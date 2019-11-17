@@ -13,12 +13,20 @@ public class PictoMessageUnitTest {
     public void test_byteConversion(){
 
         PictoMessage message = new PictoMessage("from", "to", "test", "test");
-        byte[] byteMsg = PictoMessage.pictoMessageToBytes(message);
-        PictoMessage returnMessage = PictoMessage.bytesToPictoMessage(byteMsg);
+        byte[] byteMsg;
+        PictoMessage returnMessage = new PictoMessage("fake","fake","fake","fake");
+
+        try {
+            byteMsg = PictoMessage.pictoMessageToBytes(message);
+            returnMessage = PictoMessage.bytesToPictoMessage(byteMsg);
+        }
+        catch(Exception e){
+
+        }
         assertEquals(message.fromAddress(), returnMessage.fromAddress());
         assertEquals(message.toAddress(), returnMessage.toAddress());
         assertEquals(message.textMessage(), returnMessage.textMessage());
-        assertEquals(message.contentFileName(), returnMessage.contentFileName());
+        assertEquals(message.contentSettings(), returnMessage.contentSettings());
     }
 
 }

@@ -6,6 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class LoginValidationTest {
+    /*
     @Test
     public void assertLoginInputValid(){
         assertEquals(true, LoginActivity.isValidInput("username", "password"));
@@ -26,4 +27,6 @@ public class LoginValidationTest {
     public void assertCreateAccountValid(){
         assertEquals(false, LoginActivity.validAccountCredentials("a","b"));
     }
+    */
+
 }

@@ -399,7 +399,6 @@ public class ApplicationState extends Application
     }
     public synchronized void  addMessageItem(MessageListItem  item)
     {
-
         messageList.add(0,item); //add message to the top of the list
     }
 
