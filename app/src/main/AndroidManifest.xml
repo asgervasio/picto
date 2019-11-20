@@ -4,7 +4,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,7 +15,6 @@
             android:name=".LoginActivity"
             android:label="LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
-<<<<<<< HEAD
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,22 +25,18 @@
             android:label="CameraActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-=======
 
-        </activity>
-        <activity android:name=".MessageCreateActivity" />
-        <activity android:name=".LoginActivity" >
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".MessageCreateActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" />
         <activity android:name=".MessagesListActivity" />
         <activity android:name=".MessageViewActivity" />
         <activity android:name=".MessageSendSaveActivity"></activity>
->>>>>>> master
     </application>
 
 </manifest>

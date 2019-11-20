@@ -15,7 +15,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,17 +35,30 @@ public class CameraActivity extends AppCompatActivity {
     final int TAKE_PHOTO_CODE = 5;
     ImageView imageView ;
     ApplicationState applicationState = null;
+    FirebaseUser user;
+    String name, email, uid;
+    boolean emailVerified;
+    TextView text_uid, text_email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-<<<<<<< HEAD
         setContentView(R.layout.content_camera);
-=======
         setContentView(R.layout.activity_camera);
->>>>>>> master
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if(user != null){
+            name = user.getDisplayName();
+            email = user.getEmail();
+            emailVerified = user.isEmailVerified();
+            uid = user.getUid();
+            text_uid = (TextView)findViewById(R.id.user_uid);
+            text_email = (TextView)findViewById(R.id.user_email);
+            text_uid.setText(uid);
+            text_email.setText(email);
+        }
 
         imageView = (ImageView)findViewById(R.id.imageView);
         //Toast.makeText(MainActivity.this, "Picto app started", Toast.LENGTH_LONG).show();

@@ -27,7 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         // get global data reference
-        applicationState = ((ApplicationState)getApplicationContext());
+        applicationState = ApplicationState.getApplicationStateInstance();
 
         // input filter for IP address
         InputFilter filter = new InputFilter() {
