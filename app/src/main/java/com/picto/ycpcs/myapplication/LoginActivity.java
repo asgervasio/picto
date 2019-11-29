@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText emailText, passwordText, userText;
+    EditText emailText, passwordText;
     String email, password, username;
     private FirebaseAuth mAuth;
     private static final String TAG = "CustomAuthActivity";
@@ -35,13 +35,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Views
         emailText = findViewById(R.id.email);
         passwordText = findViewById(R.id.password);
-        userText = findViewById(R.id.username);
 
         // Buttons
         findViewById(R.id.login).setOnClickListener(this);
         findViewById(R.id.createAccount).setOnClickListener(this);
 
-        username = userText.toString();
         email = emailText.toString();
         password = passwordText.toString();
         mAuth = FirebaseAuth.getInstance();
