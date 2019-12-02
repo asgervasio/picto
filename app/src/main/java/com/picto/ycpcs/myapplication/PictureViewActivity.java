@@ -69,20 +69,7 @@ public class PictureViewActivity extends AppCompatActivity {
                 {
 
                 }
- /*   old code
-                //DECODE
-                Bitmap compressed_bitmap = BitmapFactory.decodeByteArray(pngImage,0,pngImage.length);
-                //Bitmap bitmap = BitmapFactory.decodeFile("/path/images/image.jpg");
-                ByteArrayOutputStream blob = new ByteArrayOutputStream();
-                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 , blob);
-                byte[] bitmapdata = blob.toByteArray();
 
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-
-                imageView.setImageBitmap(bitmap);
-
-                applicationState.pictureToView(null);
-                */
             }
         });
 
@@ -97,7 +84,7 @@ public class PictureViewActivity extends AppCompatActivity {
         super.onBackPressed();
         finish();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.PictureListActivity"));
+        startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".PictureListActivity"));
     }
 
     void DisplayAlertOKDialog(String message)
@@ -109,7 +96,7 @@ public class PictureViewActivity extends AppCompatActivity {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
 
-                startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication","com.picto.ycpcs.myapplication.PictureListActivity"));
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".PictureListActivity"));
             }
         });
 

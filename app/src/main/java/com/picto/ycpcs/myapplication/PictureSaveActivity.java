@@ -34,7 +34,7 @@ public class PictureSaveActivity extends AppCompatActivity {
         applicationState = ((ApplicationState)getApplicationContext());
 
         final EditText captionEditView = (EditText)findViewById(R.id.editTextCaption);
-        //final EditText toAddressEditView = (EditText)findViewById(R.id.editText_toAddress);
+
 
         imageView = (ImageView)findViewById(R.id.imageViewSendSave);
 
@@ -60,7 +60,7 @@ public class PictureSaveActivity extends AppCompatActivity {
                     return;
                 }
                 saveBitmapToFile(bmp,caption);
-                startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MainActivity"));
             }
         });
 
@@ -71,7 +71,7 @@ public class PictureSaveActivity extends AppCompatActivity {
                 //Toast.makeText(MessageSendSaveActivity.this, "trash clicked", Toast.LENGTH_SHORT).show();
 
                 // son't save the message
-                startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MainActivity"));
             }
         });
 
@@ -95,7 +95,6 @@ public class PictureSaveActivity extends AppCompatActivity {
                 {
                     byteArray = applicationState.encryptBitmap(bmp, key);
                     // store the last compressed picture in global memeory
-                    //applicationState.setLastPictureCompressed(byteArray);
 
                     // store the last compressed picture in global memeory
                     applicationState.setLastPictureCompressed(byteArray);
@@ -107,6 +106,7 @@ public class PictureSaveActivity extends AppCompatActivity {
                 {
 
                 }
+
 
 
             }

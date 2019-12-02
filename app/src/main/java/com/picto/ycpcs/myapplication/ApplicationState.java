@@ -46,13 +46,17 @@ public class ApplicationState extends Application
     String messageFilenameToDelete = "";
     MessageListItem messageToView = null;
     MessageListItem pictureToView = null;
+    MessageListItem contactToView = null;
+
     CameraActivity parent;
 
     static Vector messageList = new Vector();
-    static Vector selectedHistorys = new Vector();
+    static Vector selectedMessages = new Vector();
 
     static Vector pictureList = new Vector();
     static Vector selectedPictures = new Vector();
+
+    static Vector contactList = new Vector();
 
     static Vector<PictoMessage> messageListSend = new Vector<PictoMessage>();
     static Vector<PictoMessage> messageListReceive = new Vector<PictoMessage>();
@@ -64,10 +68,14 @@ public class ApplicationState extends Application
 
     static final String picto_msg_file_prefix = "picto_msg_";  // message file prefix
     static final String picto_pic_file_prefix = "picto_pic_";  // picture file prefix
+    static final String picto_contact_file_prefix = "picto_contact_";
     static final String pictoSettingsFilename = "picto_settings.cfg";
 
     static final String picto_msg_type_Received = "Received";
     static final String picto_msg_type_Sent = "Sent";
+
+    public static final String picto_package_name = "com.picto.ycpcs.myapplication";
+
     private String ipAddress;
     private String username = "";
     private String password = "";
@@ -208,6 +216,11 @@ public class ApplicationState extends Application
         this.password = password;
     }
 
+    public synchronized String  getPictoContactFilePrefix()
+    {
+        return (this.picto_contact_file_prefix);
+    }
+
     public synchronized String  getPictoPictureFilePrefix()
     {
         return (this.picto_pic_file_prefix);
@@ -292,6 +305,8 @@ public class ApplicationState extends Application
         return(this.messageFilenameToDelete);
     }
 
+
+
     public synchronized void messageToView(MessageListItem messageItem)
     {
         this.messageToView = messageItem;
@@ -301,6 +316,8 @@ public class ApplicationState extends Application
         return(this.messageToView);
     }
 
+
+
     public synchronized void pictureToView(MessageListItem messageItem)
     {
         this.pictureToView = messageItem;
@@ -309,6 +326,18 @@ public class ApplicationState extends Application
     {
         return(this.pictureToView);
     }
+
+
+    public synchronized void contactToView(MessageListItem messageItem)
+    {
+        this.contactToView = messageItem;
+    }
+    public synchronized MessageListItem contactToView()
+    {
+        return(this.contactToView);
+    }
+
+
 
     public static ApplicationState getApplicationStateInstance() {return singleton;}
 
@@ -399,6 +428,7 @@ public class ApplicationState extends Application
     }
     public synchronized void  addMessageItem(MessageListItem  item)
     {
+
         messageList.add(0,item); //add message to the top of the list
     }
 
@@ -413,18 +443,113 @@ public class ApplicationState extends Application
         pictureList.add(0,item); //add picture to the top of the list
     }
 
-    //Selected History list
-    public synchronized Vector  getSelectedHistorys()
+    // Contact list
+    public synchronized Vector  getContactList()
     {
-        return selectedHistorys;
+        return contactList;
     }
-    public synchronized void  addSelectedHistorys(MessageListItem  item)
+    public synchronized void  addContactItem(MessageListItem  item)
     {
-        selectedHistorys.addElement(item);
+
+        contactList.add(0,item); //add picture to the top of the list
     }
-    public synchronized void  clearSelectedHistorys()
+
+    public synchronized String[]  getContactListStringArray()
     {
-        selectedHistorys.clear();
+        String[] contactListArrayStr = null;
+        MessageListItem msgItem = null;
+
+        LoadContactList();
+
+        int contactListSize = contactList.size();
+        if(contactListSize > 0)
+        {
+            contactListArrayStr = new String[contactListSize];
+            for(int index = 0; index < contactListSize; index++)
+            {
+                msgItem = (MessageListItem)contactList.elementAt(index);
+                contactListArrayStr[index] = msgItem.name();
+            }
+        }
+        else
+        {
+            contactListArrayStr = new String[1];
+            contactListArrayStr[0] = "";
+
+        }
+        return contactListArrayStr;
+    }
+    //Selected Messages list
+    public synchronized Vector  getSelectedMessages()
+    {
+        return selectedMessages;
+    }
+    public synchronized void  addSelectedMessages(MessageListItem  item)
+    {
+        selectedMessages.addElement(item);
+    }
+    public synchronized void  clearSelectedMessages()
+    {
+        selectedMessages.clear();
+    }
+
+
+    public synchronized void LoadContactList()
+    {
+        File file = null;
+        try
+        {
+            String path = getApplicationContext().getFilesDir().getPath().toString();
+            ApplicationState.debugMessage( "Contacts files folder Path:(" + path + ")");
+            file = new File(path);
+
+            if(file.exists() == true)
+            {
+                File[] files = file.listFiles();
+                ApplicationState.debugMessage( "Number of files :(" + files.length + ")");
+
+                getContactList().clear();
+
+                for(int x = 0; x<files.length; x++)
+                {
+                    String filename = files[x].getName();
+                    if(filename.startsWith(getPictoContactFilePrefix())) {
+                        ApplicationState.debugMessage("FileName:" + filename);
+                        String fpath = files[x].getAbsolutePath();
+                        long size = files[x].length();
+                        ApplicationState.debugMessage("Filepath:" + fpath);
+                        ApplicationState.debugMessage("Filesize:" + Long.toString(size));
+
+                        // read the contents of the file
+                        byte[] content = getByteArrayFromFile (fpath);
+
+                        MessageListItem newItem = bytesToMessageItem(content);
+
+                        /// add to top of the list
+                        addContactItem(newItem);
+                    }
+                    else
+                    {
+                        ApplicationState.debugMessage("FileName IGNORED:" + filename);
+                    }
+                }
+
+            }
+
+
+        }
+
+        catch (Exception e)
+        {
+            String error = e.toString();
+            // do something with error
+            if(error == null)
+            {
+
+            }
+
+        }
+
     }
 
     public synchronized void LoadPictureList()
@@ -608,21 +733,35 @@ public class ApplicationState extends Application
 
     }
 
+    public synchronized void addContact(String caption)
+    {
+        MessageListItem newItem = null;
+        Date date = new Date();
+        String filename = getApplicationContext().getFilesDir().getPath().toString() + "/" + getPictoContactFilePrefix() + Long.toString(date.getTime());
+
+        newItem = new MessageListItem(caption,filename); // create a new message item
+
+        byte[] resultBytes = MessageItemToBytes(newItem);
+
+        addContactItem(newItem); // add this new contact to the contact list
+        createFile(filename,resultBytes);
+
+    }
+
     public synchronized void addPicture(byte[] content, String caption)
     {
         MessageListItem newItem = null;
         Date date = new Date();
         String filename = getApplicationContext().getFilesDir().getPath().toString() + "/" + getPictoPictureFilePrefix() + Long.toString(date.getTime());
 
-        newItem = new MessageListItem(caption,filename); // create a new history item
+        newItem = new MessageListItem(caption,filename); // create a new picture item
         newItem.content(content);
 
         byte[] resultBytes = MessageItemToBytes(newItem);
 
-        addPictureItem(newItem); // add this new scan to the picture list
+        addPictureItem(newItem); // add this new picture to the picture list
         createFile(filename,resultBytes);
 
-        //new_messages_count++;
     }
 
     public synchronized void addMessage(String fromAddress,byte[] content, String caption,String type,String contentSettings)
@@ -631,7 +770,7 @@ public class ApplicationState extends Application
         Date date = new Date();
         String filename = getApplicationContext().getFilesDir().getPath().toString() + "/" + getPictoMsgFilePrefix() + Long.toString(date.getTime());
 
-        newItem = new MessageListItem(caption,filename); // create a new history item
+        newItem = new MessageListItem(caption,filename); // create a new message item
         newItem.content(content);
         newItem.type(type);
         newItem.fromAddress(fromAddress);
@@ -642,7 +781,6 @@ public class ApplicationState extends Application
         addMessageItem(newItem); // add this new scan to the message list
         createFile(filename,resultBytes);
 
-        //new_messages_count++;
     }
 
     public synchronized static String convertStreamToString(InputStream is) throws Exception {

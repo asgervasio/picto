@@ -27,5 +27,10 @@
         android:orderInCategory="105"
         android:title="@string/action_login"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_contacts"
+        android:orderInCategory="103"
+        android:title="@string/action_contacts"
+        app:showAsAction="never" />
 
 </menu>

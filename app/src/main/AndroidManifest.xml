@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".CameraActivity"
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -23,16 +24,38 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MessageCreateActivity" />
-        <activity android:name=".LoginActivity" >
-
-        </activity>
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".MessagesListActivity" />
-        <activity android:name=".MessageViewActivity" />
-        <activity android:name=".PictureListActivity" />
-        <activity android:name=".PictureViewActivity" />
-        <activity android:name=".PictureSaveActivity" />
-        <activity android:name=".MessageSendSaveActivity"></activity>
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".MessagesListActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".MessageViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".PictureListActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".PictureViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".PictureSaveActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ContactListActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ContactSaveActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ContactViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".MessageSendSaveActivity"
+            android:screenOrientation="portrait"/>
     </application>
 </manifest>

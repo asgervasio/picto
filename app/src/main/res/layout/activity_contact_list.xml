@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_contact_list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.picto.ycpcs.myapplication.ContactListActivity">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="700px"
+        android:layout_weight="0.1">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listViewContact" />
+    </LinearLayout>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_trash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            app:useCompatPadding="true"
+            app:srcCompat="@mipmap/ic_picto_trash" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_create"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_margin="@dimen/fab_margin"
+            app:backgroundTint="@color/material_teal_200"
+            app:useCompatPadding="true"
+            app:srcCompat="@mipmap/ic_picto_add_user_contact" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:layout_margin="@dimen/fab_margin"
+            app:backgroundTint="@color/material_blue_bright"
+            app:useCompatPadding="true"
+            app:srcCompat="@mipmap/ic_picto_view" />
+
+        <TextView
+            android:text="Delete"
+            android:layout_marginLeft="30dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_anchor="@id/fab_trash"
+            android:id="@+id/textViewTrash" />
+
+        <TextView
+            android:text="Create"
+            android:layout_marginLeft="30dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_anchor="@id/fab_create"
+            android:id="@+id/textViewCreate" />
+
+        <TextView
+            android:text="View"
+            android:layout_marginLeft="30dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_anchor="@id/fab_view"
+            android:id="@+id/textView_ViewContacts" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</LinearLayout>

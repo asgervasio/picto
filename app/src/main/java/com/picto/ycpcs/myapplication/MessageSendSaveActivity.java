@@ -8,6 +8,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -37,7 +39,7 @@ public class MessageSendSaveActivity extends AppCompatActivity {
         final EditText toAddressEditView = (EditText)findViewById(R.id.editText_toAddress);
         final Spinner spinnerTimeout  = (Spinner)findViewById(R.id.spinnerTimeout);
         spinnerTimeout.setSelection(1);
-        //captionEditView.setEnabled(false);
+
         captionEditView.setKeyListener(null); // set key listener to null to make it readonly
         imageView = (ImageView)findViewById(R.id.imageViewSendSave);
 
@@ -54,6 +56,32 @@ public class MessageSendSaveActivity extends AppCompatActivity {
             setTitle("Picto (" + applicationState.username() + ")");
         }
 
+// set contact spinner entries
+
+        String[] arraySpinner = applicationState.getContactListStringArray();
+
+        Spinner contactSpinner = (Spinner) findViewById(R.id.spinnerContacts);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arraySpinner);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        contactSpinner.setAdapter(adapter);
+
+        contactSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
+            {
+
+                    EditText textView = (EditText) findViewById(R.id.editText_toAddress);
+                    String str = (String) parentView.getItemAtPosition(position);
+                    textView.setText(str);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+
+            }
+
+        });
 
 
         Button sendbutton= (Button) findViewById(R.id.buttonSend);
@@ -92,7 +120,7 @@ public class MessageSendSaveActivity extends AppCompatActivity {
                     SendMessageOperation asyncTask = new SendMessageOperation();
                     asyncTask.execute("");
 
-                    startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+                    startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MainActivity"));
                 }
                 else
                 {
@@ -102,6 +130,33 @@ public class MessageSendSaveActivity extends AppCompatActivity {
 
             }
         });
+/*
+        Button savebutton= (Button) findViewById(R.id.buttonSave);
+        savebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(MessageSendSaveActivity.this, "save clicked", Toast.LENGTH_SHORT).show();
+
+                // save the message to file and message list
+                Bitmap bmp = applicationState.getLastPicture();
+                String caption = captionEditView.getText().toString();
+                saveBitmapToFile(bmp,caption);
+                startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
+            }
+        });
+
+        Button trashbutton= (Button) findViewById(R.id.buttonTrash);
+        trashbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(MessageSendSaveActivity.this, "trash clicked", Toast.LENGTH_SHORT).show();
+
+                // son't save the message
+                startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
+            }
+        });
+
+*/
     }
 
     public void saveBitmapToFile(final Bitmap bmp,final String caption, final String contentSettings)
@@ -138,21 +193,17 @@ public class MessageSendSaveActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-
             PictoClient client = applicationState.getPictoClient();
-            //int msgCount = 1;
 
             String caption = applicationState.caption();
             String toAddress = applicationState.toAddress();
             String contentSettings = applicationState.contentSettings();
 
-            //PictoMessage message = new PictoMessage(applicationState.username(), toAddress,caption,"message" + String.valueOf(msgCount) + ".txt");
             PictoMessage message = new PictoMessage(applicationState.username(), toAddress,caption,contentSettings);
 
             byte[] content = applicationState.getLastPictureCompressed();
 
             message.content(content);
-            //msgCount++;
 
             if(client.sendMessageToServer(message) == true)
             {

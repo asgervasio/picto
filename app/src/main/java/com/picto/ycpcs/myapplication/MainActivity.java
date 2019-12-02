@@ -1,6 +1,8 @@
 package com.picto.ycpcs.myapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,15 +25,17 @@ import java.util.Date;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
 
-    //public static int count = 0;
     final int TAKE_PHOTO_CODE = 5;
     ImageView imageView ;
     ApplicationState applicationState = null;
+    static final private int MENU_ABOUT = Menu.FIRST;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -39,6 +43,70 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = (ImageView)findViewById(R.id.imageView);
         //Toast.makeText(MainActivity.this, "Picto app started", Toast.LENGTH_LONG).show();
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_camera);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                takePicture();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
+
+        FloatingActionButton fabmessages = (FloatingActionButton) findViewById(R.id.fab_message);
+        fabmessages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MessagesListActivity"));
+
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
+
+        FloatingActionButton fabpictures = (FloatingActionButton) findViewById(R.id.fab_picture);
+        fabpictures.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".PictureListActivity"));
+
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
+
+        FloatingActionButton fabsettings = (FloatingActionButton) findViewById(R.id.fab_settings);
+        fabsettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".SettingsActivity"));
+
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
+
+        FloatingActionButton fabcontacts = (FloatingActionButton) findViewById(R.id.fab_contacts);
+        fabcontacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".ContactListActivity"));
+
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
+
+        FloatingActionButton fablogin = (FloatingActionButton) findViewById(R.id.fab_login_server);
+        fablogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".LoginActivity"));
+
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
 
         // get global data reference
         applicationState = ((ApplicationState)getApplicationContext());
@@ -57,9 +125,42 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.MainActivity"));
+        //startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
+        startActivity(new Intent().setClassName(applicationState.picto_package_name,  applicationState.picto_package_name + ".MainActivity"));
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        menu.add(0, MENU_ABOUT, Menu.NONE, "About");
+
+
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId())
+        {
+
+            case (MENU_ABOUT):
+            {
+
+                DisplayAlertOKDialog("Picto version 1.0\n" +
+                        "Developed for CS 381\n\n" +
+                        "Development team:\n\n" );
+
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -92,6 +193,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, PictureListActivity.class));
             return true;
         }
+        else if (id == R.id.action_contacts)
+        {
+            startActivity(new Intent(this, ContactListActivity.class));
+            return true;
+        }
         // action_pictures
         else if (id == R.id.action_take_picture) {
             //Toast.makeText(MainActivity.this, "Search clicked", Toast.LENGTH_LONG).show();
@@ -104,17 +210,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, LoginActivity.class));
             return true;
         }
-        /*
-        else if (id == R.id.action_connect) {
-            Toast.makeText(MainActivity.this, "Connect not supported", Toast.LENGTH_LONG).show();
 
-            //ConnectOperation asyncTask=new ConnectOperation();
-            //asyncTask.execute("https://www.tutorialspoint.com/images/tp-logo-diamond.png");
-            return true;
-        }
-*/
         return super.onOptionsItemSelected(item);
     }
+*/
 
 public void startLoginActivity()
 {
@@ -160,6 +259,7 @@ public void startLoginActivity()
 
         super.onActivityResult(requestCode, resultCode, data);
     }
+
     void loadSettings()
     {
         try {
@@ -181,54 +281,21 @@ public void startLoginActivity()
 
         }
     }
-/*
-    private class ConnectOperation extends AsyncTask<String, Void, String> {
 
-        @Override
-        protected String doInBackground(String... params) {
+    void DisplayAlertOKDialog(String message)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message);
+        builder.setCancelable(false);
 
-            //connect();  // old code
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
 
-            PictoClient client = null;
-            int msgCount = 1;
+            }
+        });
 
-            // new thread for a client
-            client = new PictoClient();
-            client.connect("192.168.1.8");
-            client.login("bob", "password");
-
-            toastOnGUI("Picto Client Main. connect ");
-            applicationState.setPictoClient(client);
-
-
-            return "Executed";
-        }
-        @Override
-        protected void onPostExecute(String result) {
-
-
-            //TextView txt = (TextView) findViewById(R.id.output);
-            //txt.setText("Executed"); // txt.setText(result);
-            // might want to change "executed" for the returned string passed
-            // into onPostExecute() but that is upto you
-        }
-
-        @Override
-        protected void onPreExecute() {}
-
-        @Override
-        protected void onProgressUpdate(Void... values) {}
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
-
-        public void toastOnGUI(final String message) {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    // use data here
-                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-
-        */
 }

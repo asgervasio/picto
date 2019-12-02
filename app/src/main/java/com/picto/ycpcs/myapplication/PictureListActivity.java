@@ -5,10 +5,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -32,12 +34,16 @@ public class PictureListActivity extends AppCompatActivity {
 
     ApplicationState applicationState = null;
     String filesSelected;
+    Intent intent;
+    int selectedCount;
+    PictureListActivity ourself;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_list);
 
+        ourself = this;
 
         pictureListView = (ListView)this.findViewById(R.id.listViewPicture);
         // get global data reference
@@ -45,6 +51,85 @@ public class PictureListActivity extends AppCompatActivity {
 
         pictureListView.setItemsCanFocus(false);
         pictureListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE); // CHOICE_MODE_MULTIPLE
+
+        FloatingActionButton fabtrash = (FloatingActionButton) findViewById(R.id.fab_trash);
+        fabtrash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectedCount = getPictureSelectedCount();
+                if(selectedCount == 0)
+                {
+                    // no item selected message
+                    DisplayAlertOKDialog("A picture item must be selected to Delete it!");
+                }
+                else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ourself);
+                    builder.setMessage("Are you sure you want to delete the selected file(s)?\n")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    DeletePictureItem();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            }
+        });
+
+        FloatingActionButton fabview = (FloatingActionButton) findViewById(R.id.fab_view);
+        fabview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectedCount = getPictureSelectedCount();
+                if(selectedCount == 0)
+                {
+                    // no item selected message
+                    DisplayAlertOKDialog("A picture item must be selected to View it!");
+                }
+                else if(selectedCount > 1)
+                {
+                    // not allowed dialog
+                    DisplayAlertOKDialog("You have multiples picture items selected. Only single picture view is supported!");
+                }
+                else {
+                    SetPictureToView();
+                    intent = new Intent();
+                    intent.setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".PictureViewActivity");
+                    startActivity(intent);
+                }
+            }
+        });
+
+        FloatingActionButton fabsend = (FloatingActionButton) findViewById(R.id.fab_send);
+        fabsend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectedCount = getPictureSelectedCount();
+                if(selectedCount == 0)
+                {
+                    // no item selected message
+                    DisplayAlertOKDialog("A picture item must be selected to Send it!");
+                }
+                else if(selectedCount > 1)
+                {
+                    // not allowed dialog
+                    DisplayAlertOKDialog("You have multiples Picture items selected. Only single picture send is supported!");
+                }
+                else {
+                    SetPictureToSend();
+                    intent = new Intent();
+                    //intent.setClassName("com.cs381.picto", "com.cs381.picto.PictureViewActivity");
+                    intent.setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MessageSendSaveActivity");
+                    startActivity(intent);
+                }
+            }
+        });
 
         if(applicationState.username().length() > 0) {
             setTitle("Picto (" + applicationState.username() + ")");
@@ -88,9 +173,11 @@ public class PictureListActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+        //startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
+        startActivity(new Intent().setClassName(applicationState.picto_package_name,  applicationState.picto_package_name + ".MainActivity"));
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -127,7 +214,7 @@ public class PictureListActivity extends AppCompatActivity {
                 else {
                     SetPictureToView();
                     intent = new Intent();
-                    intent.setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.PictureViewActivity");
+                    intent.setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".PictureViewActivity");
                     startActivity(intent);
                 }
                 return true;
@@ -150,7 +237,8 @@ public class PictureListActivity extends AppCompatActivity {
                 else {
                     SetPictureToSend();
                     intent = new Intent();
-                    intent.setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.MessageSendSaveActivity");
+                    //intent.setClassName("com.cs381.picto", "com.cs381.picto.PictureViewActivity");
+                    intent.setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MessageSendSaveActivity");
                     startActivity(intent);
                 }
                 return true;
@@ -190,8 +278,9 @@ public class PictureListActivity extends AppCompatActivity {
         return false;
     }
 
-    // deletes any history items that are currently checked off.
-    public void DeleteHistoryItem()
+*/
+    // deletes any picture items that are currently checked off.
+    public void DeletePictureItem()
     {
 
         MessageListItem theItem = null;
@@ -314,6 +403,18 @@ public class PictureListActivity extends AppCompatActivity {
                 {
 
                 }
+ /*
+                //DECODE
+                Bitmap compressed_bitmap = BitmapFactory.decodeByteArray(pngImage,0,pngImage.length);
+
+                ByteArrayOutputStream blob = new ByteArrayOutputStream();
+                compressed_bitmap.compress(Bitmap.CompressFormat.PNG, 0 , blob);
+                byte[] bitmapdata = blob.toByteArray();
+
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+
+                applicationState.setLastPicture(bitmap);
+*/
 
             }
         });

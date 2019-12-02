@@ -6,7 +6,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextHistoryView"
+        android:id="@+id/editTextMessageView"
         android:inputType="none"
         android:editable="false" />
 
@@ -14,5 +14,5 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_centerHorizontal="true"
-        android:id="@+id/imageViewHistory" />
+        android:id="@+id/imageViewMessage" />
 </LinearLayout>

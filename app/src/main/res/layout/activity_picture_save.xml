@@ -23,7 +23,8 @@
         android:inputType="textPersonName"
         android:ems="10"
         android:id="@+id/editTextCaption"
-        android:hint="Caption" />
+        android:hint="Caption"
+        android:digits=" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^*()-_+=?" />
 
     <Button
         android:text="Save"

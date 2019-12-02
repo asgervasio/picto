@@ -80,13 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                     showLoginDialogButtonClicked(view,"You must specify a username in settings before login");
                     return;
                 }
-                /*
-                if(password.length() == 0)
-                {
-                    showLoginDialogButtonClicked(view,"You must specify a password before login");
-                    return;
-                }
-                */
+
 
                 createAccountChecked = checkBox_CreateAccount.isChecked();
 
@@ -105,7 +99,8 @@ public class LoginActivity extends AppCompatActivity {
     {
         super.onBackPressed();
 
-        startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
+        //startActivity(new Intent().setClassName("com.cs381.picto", "com.cs381.picto.MainActivity"));
+        startActivity(new Intent().setClassName(applicationState.picto_package_name,  applicationState.picto_package_name + ".MainActivity"));
     }
 
     private class LoginToServerOperation extends AsyncTask<String, Void, String> {
@@ -142,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
                     applicationState.username(username);
                     applicationState.password(password);
                     applicationState.loggedIn(true);
-                    startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.CameraActivity"));
+                    startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MainActivity"));
 
 
                 }

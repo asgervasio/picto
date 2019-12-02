@@ -32,8 +32,8 @@ public class MessageViewActivity extends AppCompatActivity {
         // get global data reference
         applicationState = ((ApplicationState)getApplicationContext());
 
-        editView = (EditText)findViewById(R.id.editTextHistoryView);
-        imageView = (ImageView)findViewById(R.id.imageViewHistory);
+        editView = (EditText)findViewById(R.id.editTextMessageView);
+        imageView = (ImageView)findViewById(R.id.imageViewMessage);
 
         theMessageItem = applicationState.messageToView();
 
@@ -45,19 +45,17 @@ public class MessageViewActivity extends AppCompatActivity {
         editView.setText(theMessageItem.toString() + " (timeout " + theMessageItem.contentSettings() + " sec)");
         byte[] pngImage = theMessageItem.content();
 
-        ////viewTimedImage(pngImage,theMessageItem);
         displayMessage(pngImage,theMessageItem);
 
 
+
     }
+
     public void  displayMessage(final byte[] pngImage,final MessageListItem theMessageItem)
     {
         // this needs to be run in its own thread because the compression can take some time and
         // we don't want to stall the GUI thread.
-        //runOnUiThread(new Runnable() {
-         //   public void run() {
 
-        //byte[] key = applicationState.AES_key_128;
         byte[] key = applicationState.makeEncryptKey(theMessageItem.fromAddress(),theMessageItem.name());
         String byteString = applicationState.bytesToHex(key);
         applicationState.addStatusMessage(",displayMessage username =" + theMessageItem.fromAddress() + ", caption =" + theMessageItem.name() + ", key = " + byteString);
@@ -77,6 +75,7 @@ public class MessageViewActivity extends AppCompatActivity {
 
             applicationState.messageToDelete(theMessageItem.filename());
         }
+
 
     }
 
@@ -100,12 +99,7 @@ public class MessageViewActivity extends AppCompatActivity {
             {
                 if(allowDelay)
                 {
-                    /*
-                    int sleeptime = Integer.parseInt(theMessageItem.contentSettings());
-                    if ((sleeptime < 1) || (sleeptime > 10)) {
-                        sleeptime = 5;
-                    }
-                    */
+
 
                     int sleeptime = Integer.parseInt(theMessageItem.contentSettings()) * 1000;
                     if ((sleeptime < 1000) || (sleeptime > 10000)) {
@@ -115,13 +109,7 @@ public class MessageViewActivity extends AppCompatActivity {
                     try
                     {
                         sleep(sleeptime); // the sleep the amount of time the user can view the message
-                        /*
-                        for(int sleepCount = 0; sleepCount < sleeptime; sleepCount++) {
-                            guiActivity.editView.setText(theMessageItem.toString() + " (timeout " + Integer.toString(sleeptime - sleepCount) + " sec)");
-                            sleep(1000); // the sleep the amount of time the user can view the message
 
-                        }
-                        */
                     }
                     catch(Exception e)
                     {
@@ -131,7 +119,7 @@ public class MessageViewActivity extends AppCompatActivity {
                 // delete the message
                 applicationState.messageToDelete(theMessageItem.filename());
                 // switch to the message list activity
-                startActivity(new Intent().setClassName("com.cs381.picto","com.cs381.picto.MessagesListActivity"));
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MessagesListActivity"));
 
             }
         }
@@ -139,12 +127,13 @@ public class MessageViewActivity extends AppCompatActivity {
         t.start();
     }
 
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
 
-        startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication", "com.picto.ycpcs.myapplication.MessagesListActivity"));
+        startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MessagesListActivity"));
     }
 
     void DisplayAlertOKDialog(String message)
@@ -156,7 +145,7 @@ public class MessageViewActivity extends AppCompatActivity {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
 
-                startActivity(new Intent().setClassName("com.picto.ycpcs.myapplication","com.picto.ycpcs.myapplication.MessagesListActivity"));
+                startActivity(new Intent().setClassName(applicationState.picto_package_name, applicationState.picto_package_name + ".MessagesListActivity"));
             }
         });
 
