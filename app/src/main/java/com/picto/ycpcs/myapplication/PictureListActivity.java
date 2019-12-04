@@ -33,6 +33,7 @@ public class PictureListActivity extends AppCompatActivity {
     ApplicationState applicationState = null;
     String filesSelected;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +48,7 @@ public class PictureListActivity extends AppCompatActivity {
         pictureListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE); // CHOICE_MODE_MULTIPLE
 
 
-        applicationState.LoadPictureList();
+        //applicationState.LoadPictureList();
 
         Vector pictureList = applicationState.getPictureList();
         int sizeToRead = pictureList.size();

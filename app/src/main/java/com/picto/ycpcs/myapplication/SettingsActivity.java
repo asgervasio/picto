@@ -62,7 +62,7 @@ public class SettingsActivity extends AppCompatActivity {
         editText_username = (EditText)findViewById(R.id.editText_username);
 
         checkBox_displayDebug = (CheckBox)findViewById(R.id.checkBox_displayDebug);
-        checkBox_displayDebug.setChecked(applicationState.debugEnabled());
+        //checkBox_displayDebug.setChecked(applicationState.debugEnabled());
 
 
         Button button= (Button) findViewById(R.id.button_save);
