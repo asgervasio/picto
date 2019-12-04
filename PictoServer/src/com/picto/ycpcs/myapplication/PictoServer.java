@@ -64,21 +64,12 @@ public class PictoServer extends Thread {
 			server_thread_running = false;
 		}
 	}
-	
+/*	
 	public PictoMessage CreateTestReadMessage(String inboxName)
 	{
 		PictoMessage message = new PictoMessage("Ed",inboxName,"message for you","messagetest.txt");		
 		PictoMessage message2 = null;
-/*		
-		byte[] image1 = new byte[10];
 		
-		for(int x = 0; x<10; x++)
-		{
-			image1[x] = 'C';
-		}		
-		
-		message.content(image1);
-*/		
 		try 
 		{
 		byte[] buffer = PictoMessage.pictoMessageToBytes(message);
@@ -93,7 +84,7 @@ public class PictoServer extends Thread {
 		
 		return message;
 	}
-	
+	*/
 	public synchronized ArrayList<PictoClient> getClientList()
 	{
 		return(clientList);

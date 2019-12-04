@@ -20,6 +20,7 @@ public class CommandHeader {
     public static final int STATUS_ERROR_USER_NOT_FOUND = 1;
     public static final int STATUS_ERROR_UNAUTHORIZED = 2;
     public static final int STATUS_ERROR_LOGIN_USERNAME_USED = 3;
+    public static final int STATUS_ERROR_LOGIN_INVALID_PASSWORD = 4;
 
 
     public CommandHeader(int signature,int commandType,int version,int status, int payloadSize)

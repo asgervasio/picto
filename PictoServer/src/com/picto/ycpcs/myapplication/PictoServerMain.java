@@ -15,7 +15,18 @@ public class PictoServerMain
 	public static void main(String[] args) 
 	{
 	   PictoServer server = null; 
+	   /*
+	   String hashed_password;
 	   
+	   try
+		{
+			hashed_password = ApplicationState.toHexString(ApplicationState.getSHA("password_bob"));
+		}
+		catch(Exception e)
+		{
+			
+		}
+	   */
 	   // get buffered reader for keyboard input to be used to exit the server		   
 	   reader =  new BufferedReader(new InputStreamReader(System.in)); 
 	 

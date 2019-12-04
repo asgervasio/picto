@@ -40,6 +40,7 @@ public class PictoClient extends Thread {
     PictoDB database = null;
     String username = null; // this gets set when user logs in
     String password = null;
+    int db_user_id = 0;
     int clientID = 0;
     Date activityTime = null;
 	
@@ -468,11 +469,13 @@ public class PictoClient extends Thread {
 		        	}
 		        	
 		        	int loginResponse; 
-		        	if(database.isValidUserAccount(username) == true)
+		        	// if(database.isValidUserAccount(username) == true)
+		        	int rv = database.isValidUserAccount(username,password);
+		        	if(rv > 0)
 		        	{
 		        		if(createAccount == 0)
 		        		{
-		        		loginResponse = CommandHeader.STATUS_SUCCESS;
+		        			loginResponse = CommandHeader.STATUS_SUCCESS;
 		        		}
 		        		else
 		        		{
@@ -480,13 +483,13 @@ public class PictoClient extends Thread {
 		        			loginResponse = CommandHeader.STATUS_ERROR_LOGIN_USERNAME_USED;
 		        		}
 		        	}
-		        	else
+		        	else if(rv == 0)  // user doesn't exist in database
 		        	{
 		        		// if client wants to create a new account
 		        		if(createAccount == 1)
 		        		{
 		        			// create a new user account
-		        			database.createUserAccount(username);
+		        			database.createUserAccount(username,password);
 		        			loginResponse = CommandHeader.STATUS_SUCCESS;
 		        		}
 		        		else
@@ -495,6 +498,12 @@ public class PictoClient extends Thread {
 		        			loginResponse = CommandHeader.STATUS_ERROR_USER_NOT_FOUND;
 		        		}
 		        	}
+		        	else // user exists and the password doesn't match
+		        	{
+		        		// no such user account so return error
+	        			loginResponse = CommandHeader.STATUS_ERROR_LOGIN_INVALID_PASSWORD;
+		        	}
+		        	
 	        		header = new CommandHeader(CommandHeader.SIGNATURE,CommandHeader.CMD_LOGIN_MSG,CommandHeader.VERSION,loginResponse,0);
 	    			
 	    			byte[] headerBytes = header.exportHeader();
@@ -556,7 +565,7 @@ public class PictoClient extends Thread {
 		
 		return msg;
 	}
-	
+/*	
 	public synchronized PictoMessage ReceiveMsg()
 	{				
 		PictoMessage msg = null;
@@ -673,7 +682,8 @@ public class PictoClient extends Thread {
 			        	}
 			        	
 			        	int loginResponse; 
-			        	if(database.isValidUserAccount(username) == true)
+			        	// if(database.isValidUserAccount(username) == true)
+			        	if(database.isValidUserAccount(username) > 0)
 			        	{
 			        		if(createAccount == 0)
 			        		{
@@ -691,7 +701,7 @@ public class PictoClient extends Thread {
 			        		if(createAccount == 1)
 			        		{
 			        			// create a new user account
-			        			database.createUserAccount(username);
+			        			database.createUserAccount(username,password);
 			        			loginResponse = CommandHeader.STATUS_SUCCESS;
 			        		}
 			        		else
@@ -761,5 +771,5 @@ public class PictoClient extends Thread {
 		
 		return msg;
 	}
-
+*/
 }
